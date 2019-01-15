@@ -1,5 +1,7 @@
 module Parser.Combinators.Base ( ParserRes(..)
                                , Parser
+                               -- Tha alias Label is everywhere lul
+                               , Parser.Data.Syntax.Label
                                , succeed
                                , failp
                                , token
