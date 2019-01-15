@@ -26,6 +26,11 @@ type Parser =  String -> ParserRes
 succeed   :: ParseTree -> Parser
 succeed t = \i -> Success t i
 
+-- Parser that represents an empty production. The parser always succeeds with
+-- an "empty" ParseTree (see Parser.Data.Syntax)
+eps :: Parser
+eps = succeed Eps
+
 -- A parser that fails regardless of its input
 failp :: Parser
 failp = \i -> Failure i
