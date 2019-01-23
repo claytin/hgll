@@ -2,5 +2,5 @@ import Parser.Combinators.Base
 
 sbin  = s "SBIN" [op, bin]
 bin   = s "BIN"  [digit, bin] >|< digit
-op    = token "-" >|< token "+"
-digit = token "0" >|< token "1"
+op    = t "-" >|< t "+"
+digit = t "0" >|< t "1"
