@@ -4,7 +4,7 @@ module Parser.Combinators.Base ( ParserRes(..)
                                , Parser.Data.Syntax.Label
                                , succeed
                                , failp
-                               , token
+                               , term
                                , sqnc, s
                                , alt, (>|<) ) where
 
@@ -17,7 +17,10 @@ data ParserRes = Success ParseTree String
                | Failure String
 
 instance Show ParserRes where
-    show (Success t s) = "Success _:" ++ show s ++ "\n\n" ++ show t
+    show (Success t s) = "Success _:" ++ show s ++ newLine
+                      ++ newLine
+                      ++ show t
+                      where newLine = "\n"
     show (Failure s)   = "Failure " ++ show s
 
 -- For now a parser is a fuction that takes a string and returns a ParserRes
@@ -38,12 +41,12 @@ failp :: Parser
 failp = \i -> Failure i
 
 -- Since iso EBNF terminals are strings and that this implementation have no
--- parametrization of its parsers, this is our only parser for matching
+-- parametrization of its parsers, this is the only parser for matching
 -- terminals. It takes a string s of size n that will be matched against the
 -- first n characters of input i, represented by s'
-token    :: String -> Parser
-token "" = error "Err: tokens must be non empty strings!"
-token s  = \i ->
+term    :: String -> Parser
+term "" = error "Err: tokens must be non empty strings!"
+term s  = \i ->
     let n  = length s
         s' = take n i
         i' = drop n i
@@ -76,9 +79,9 @@ alt p q = \i -> case p i of
     s           -> s
 
 -- Aliases
+t = term
 s = sqnc
 
 -- a >|< b >|< ... >|< z = a >|< (b >|< (... >|< z))
 infixr 2 >|<
 (>|<) = alt
-
