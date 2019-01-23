@@ -3,8 +3,8 @@ module Parser.Data.Syntax ( ParseTree(..)
                           , Tk ) where
 
 -- Some aliases, cause readability
-type Label   = String
-type Tk      = String -- Tk stands for token
+type Label = String
+type Tk    = String -- Tk stands for token
 
 -- A parse tree is composed of the following elements
 -- Eps:  empty;
@@ -41,20 +41,17 @@ instance Eq ParseTree where
 -- Pretty printing
 -- Don't worry about it, there is nothing pretty about pretty printing
 
--- | Utility functions
-newLine :: String
-newLine = "\n"
-
+-- Utility functions
 indent   :: Int -> String
 indent n = (concat . replicate n) "  "
 
 align   :: Int -> String
 align n = newLine ++ indent n
--- |
+          where newLine = "\n"
 
 -- The structure of the definitions of indentShow and show hopefully depicts
 -- how the tree is displayed
-indentShow          :: Int -> [ ParseTree ] -> String
+indentShow          :: Int -> [ParseTree] -> String
 indentShow n [ ]    = ""
 indentShow n (x:xs) = case x of
     (Node l c) -> align n ++ "[." ++ l
