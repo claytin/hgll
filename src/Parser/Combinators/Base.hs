@@ -1,10 +1,8 @@
 module Parser.Combinators.Base ( ParserRes(..)
                                , Parser
-                               -- Tha alias Label is everywhere lul
-                               , Parser.Data.Syntax.Label
                                , succeed
                                , failp
-                               , term
+                               , term, t
                                , sqnc, s
                                , alt, (>|<) ) where
 
@@ -20,7 +18,7 @@ instance Show ParserRes where
     show (Success t s) = "Success _:" ++ show s ++ newLine
                       ++ newLine
                       ++ show t
-                      where newLine = "\n"
+                         where newLine = "\n"
     show (Failure s)   = "Failure " ++ show s
 
 -- For now a parser is a fuction that takes a string and returns a ParserRes
