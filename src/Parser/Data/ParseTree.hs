@@ -1,6 +1,5 @@
-module Parser.Data.Syntax ( ParseTree(..)
-                          , Label
-                          , Tk ) where
+module Parser.Data.ParseTree ( ParseTree(..)
+                             , Label ) where
 
 -- Some aliases, cause readability
 type Label = String
