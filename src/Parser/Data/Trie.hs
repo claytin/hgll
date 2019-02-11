@@ -36,8 +36,8 @@ fetch (k:ks) t = case Map.lookup k (links t) of
 -- It is in some ways similar to fetch, we walk down the path for the given
 -- Key (k:ks), if we walked through the hole path, return a trie that now
 -- stores v, otherwise see if the current trie has a link for k, if no link is
--- found, add a new link for k and proced to the new added node, if k already
--- is a link proceed to the correspondent sub-tree
+-- found it adds a new link for k and proced to the new added node, if k
+-- already is a link proceed to the correspondent sub-tree
 add            :: Key -> v -> Trie v -> Trie v
 add [ ]    v t = Trie { value = Just v, links = links t }
 add (k:ks) v t =
