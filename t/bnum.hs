@@ -1,4 +1,4 @@
-import Parser.Combinators.Base
+import Parser.Parser
 
 sbin  = s "SBIN" [op, bin]
 bin   = s "BIN"  [digit, bin] >|< digit
