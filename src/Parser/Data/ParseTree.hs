@@ -48,7 +48,7 @@ align   :: Int -> String
 align n = newLine ++ indent n
           where newLine = "\n"
 
--- The structure of the definitions of indentShow and show hopefully depicts
+-- The structure of the definitions of indentShow and show, hopefully depicts
 -- how the tree is displayed
 indentShow          :: Int -> [ParseTree] -> String
 indentShow n [ ]    = ""
