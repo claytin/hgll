@@ -49,32 +49,36 @@ add (k:ks) v t =
     in Trie { value = value t                        -- preservs the value of t
             , links = Map.insert k trie' (links t) } -- updates the links of t
 
--- Pretty printing
--- Don't worry about it, there is nothing pretty about pretty printing
+instance (Eq v) => Eq (Trie v) where
+    t == t'
+        | value t == value t' = links t == links t'
+        | otherwise           = False
+
+{-- Pretty printing
+ -- Don't worry about it, there is nothing pretty about pretty printing --}
 
 -- Utility show functions
-indent   :: Int -> String
-indent n = (concat . replicate n) "  "
-
-align   :: Int -> String
-align n = newLine ++ indent n
-          where newLine = "\n"
-
 links' :: Trie v -> [(Char, Trie v)]
 links' = Map.toList . links
 
--- The structure of the definitions of indentShow and show hopefully depicts
--- how the tree is displayed
-indentShow               :: (Show v) => Int -> [(Char, Trie v)] -> String
-indentShow n [ ]         = ""
-indentShow n ((k, t):ts) =
-    align n ++ "[.(" ++ [k] ++ ", " ++ value' t ++ ")"
-            ++ indentShow (n + 1) (links' t) ++ " ]"
-            ++ indentShow n ts
-    where value' trie = case value trie of
-              Nothing -> ""
-              Just v  -> show v
+show'          :: Show v => Trie v -> String -> String
+show' t prefix = showMap prefix (links' t)
 
-instance (Show v) => Show (Trie v) where
-    show t = "[.(, )"
-          ++ indentShow 1 (links' t) ++ " ]"
+showMap                    :: Show v => String -> [(Char, Trie v)] -> String
+showMap _      []          = ""
+showMap prefix ((k, t):ls) = case value t of
+    (Just v) -> "Key: " ++ path ++ "\n"
+             ++ "Value: " ++ show v ++ "\n"
+             ++ show' t (k:prefix) -- k:prefix is the key to t
+             ++ showMap prefix ls
+             -- split for readability
+    _        -> show' t (k:prefix)
+             ++ showMap prefix ls
+    where
+        path = reverse (k:prefix)
+
+instance (Show v, Eq v) => Show (Trie v) where
+    show t
+        | t == empty = "Empty"
+        | otherwise  = showMap "" (links' t)
+
