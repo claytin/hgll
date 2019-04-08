@@ -2,8 +2,9 @@
 -- Some of the comments for the implementation of some of the combinators do
 -- not match their implementation
 module Parser.Combinators.Base ( Parser
-                               , ParseRes(..)
+                               , PR(..)
                                , Input
+                               , Label -- defined by Parser.Data.ParseTree
                                , eps
                                , term, t
                                , sqnc, s
@@ -14,14 +15,16 @@ import Parser.Data.ParseTree
 -- The result of applying a parser is either a Success, for which is given the
 -- correspondent ParseTree and the remainder of the input, or it is a Failure,
 -- for which we return the unmodified input
-data ParseRes = Success ParseTree String
-              | Failure String
+data PR = Success ParseTree Input
+        | Failure Input
+
+-- where
+type Input = String
 
 {-- Combinators --}
 -- A parser is a fuction that takes a memo, some data structure that holds
--- computed values, a string, and returns a ParseRes
-type Parser = Input -> ParseRes -- where
-type Input  = String
+-- computed values, a string, and returns a PR
+type Parser = Input -> PR -- where
 
 -- Parser that represents an empty production. The parser always succeeds with
 -- an "empty" ParseTree (see Parser.Data.Syntax)
@@ -72,9 +75,17 @@ s = sqnc
 infixr 2 >|< -- should this be left associative?
 (>|<) = alt
 
-instance Show ParseRes where
-    show (Success t r) = "Success _:" ++ show r ++ newLine
-                    ++ newLine
-                    ++ show t
-                       where newLine = "\n"
+instance Eq PR where
+    (Failure _)   == (Failure _)     = True
+    (Success _ _) == (Failure _)     = False
+    (Failure _)   == (Success _ _)   = False
+    (Success t r) == (Success t' r') = t == t' && r == r'
+
+{-- Pretty printing
+ -- Don't worry about it, there is nothing pretty about pretty printing --}
+
+instance Show PR where
+    show (Success t r) = "Success _:" ++ show r ++ "\n"
+                      ++ "\n"
+                      ++ show t
     show (Failure r)   = "Failure " ++ show r
