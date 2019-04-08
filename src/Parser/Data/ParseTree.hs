@@ -45,8 +45,7 @@ indent   :: Int -> String
 indent n = (concat . replicate n) "  "
 
 align   :: Int -> String
-align n = newLine ++ indent n
-          where newLine = "\n"
+align n = "\n" ++ indent n
 
 -- The structure of the definitions of indentShow and show, hopefully depicts
 -- how the tree is displayed
