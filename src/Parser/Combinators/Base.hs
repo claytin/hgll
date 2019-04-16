@@ -21,6 +21,13 @@ type Input = String
 type Parser = Input -> ParseRes
 
 {-- Combinators --}
+
+success   :: ParseTree -> Parser
+success t = \i -> [(t, i)]
+
+failure   :: Parser
+failure   = \i -> []
+
 -- Parser that represents an empty production. The parser always succeeds with
 -- an "empty" ParseTree (see Parser.Data.Syntax)
 eps :: Parser
@@ -39,19 +46,20 @@ term s  = \i ->
     in if s == s' then [(Leaf s', i')]
        else            []
 
+bind     :: Parser -> (ParseTree -> Parser) -> Parser
+bind p f = \i -> concat [ (f t) i' | (t, i') <- p i ]
+
 -- The sequence combinator takes a list of parsers and apply each of them, in
 -- order, to the given input. For each successful match the resulting ParseTree
 -- is stored as one of the children of the sequence, if all parsers succeed the
 -- correpondent sub-tree is retuned, otherwise it fails without modifiyng the
 -- original input, there is no partial parsing of a sequence
 sqnc      :: Label -> [Parser] -> Parser
-sqnc l [] = error $ "Sequence " ++ l ++ " must not be empty!"
-sqnc l ps = \i -> sqnc' ps i []
-    -- reverse is used because the parse trees are being prepended into acc
-    where sqnc' []     inp acc = [(Node l $ reverse acc, inp)]
-          sqnc' (q:qs) inp acc = case q inp of
-              []          -> []
-              [(t, inp')] -> sqnc' qs inp' (t:acc)
+sqnc l []     = error $ "Sequence " ++ l ++ " must not be empty!"
+sqnc l (p:[]) = p
+sqnc l (p:ps) = p         `bind` \x  ->
+                sqnc l ps `bind` \xs ->
+                success $ Node l (x:[xs])
 
 -- A first match alternative combinator, if the first of the combinators (p)
 -- succeed then its result is returned, otherwise we try to match q
