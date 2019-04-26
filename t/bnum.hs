@@ -1,6 +1,11 @@
-import Parser.Parser
+import Parser.Combinators.Base
 
-sbin  = s "SBIN" [op, bin]
-bin   = s "BIN"  [digit, bin] >|< digit
-op    = t "-" >|< t "+"
-digit = t "0" >|< t "1"
+sbin  = rule "SBIN" [ op +> bin ]
+
+bin   = rule "BIN"
+      [ digit +> bin
+      , digit ]
+
+op    = rule "OP" [ t "-" , t "+" ]
+
+digit = rule "DIGIT" [ t "0" , t "1" ]
