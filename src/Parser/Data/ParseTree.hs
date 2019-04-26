@@ -5,60 +5,47 @@ module Parser.Data.ParseTree ( ParseTree(..)
 type Label = String
 type Tk    = String -- Tk stands for token
 
--- A parse tree is composed of the following elements
--- Eps:  empty;
--- Leaf: a node that can only be a terminal;
--- Node: an inner node; labeled by a rule of the grammar and has n >= 0
---       children, sub-trees
+-- A parse tree is composed of at least one of the following elements
+-- Eps:   represents an empty production;
+-- Token: it is a leaf node that corresponds to a grammar terminal. The
+--        parameter for this constructor is a string Tk;
+-- Seq:   a constructor that has no direct correspondent on grammars or parse
+--        trees, it is sort of an intermidiary that allows the existence of
+--        labeled rules. A grammar rule is composod by at least one sequence of
+--        n >= 1 juxtapostion of elements, this juxtapostion is represented by
+--        the Seq constructor. Seq is a binary sub-tree with (L)eft and (R)ight
+--        branches, the recursive structure of Seq allows for arbitrarily big
+--        sequencies, building an unbaleced ParseTree;
+-- Rule:  corresponds to the parsing of one of the (Alt)ernatives of the
+--        grammar rule identified by Label. It a acts as a sort of container
+--        for the elements of ParseTree.
 data ParseTree = Eps
-               | Leaf Tk
-               | Node Label [ ParseTree ]
+               | Token Tk
+               | Seq   L R
+               | Rule  Label Alt
+               deriving (Ord, Eq)
+-- where
+type L   = ParseTree
+type R   = ParseTree
+type Alt = ParseTree
 
-instance Ord ParseTree where
-    -- Eps cases
-    compare Eps Eps = EQ
-    compare _   Eps = GT -- any production or token is greater than Eps
-    compare Eps _   = LT -- duh!
-    -- Leaf cases
-    compare (Node _ _) (Leaf _)   = GT -- a rule is greater than a token
-    compare (Leaf _)   (Node _ _) = LT -- duh!
-    compare (Leaf tk)  (Leaf tk') = compare tk tk'
-    -- Node case
-    -- * Two productions are equal if all its sub-trees are equal, notice that
-    --   there is no comparison of labels, as long as the trees have the same
-    --   structure we are fine, variables can always be renamed
-    compare (Node _ (t:ts)) (Node _ (t':ts')) = case compare t t' of
-        EQ -> compare ts ts'
-        GT -> GT -- "first match ordering"; somewhat lexicographic
-        LT -> LT -- same
+{-- Pretty printing;
+ -- Don't worry about it, there is nothing pretty about pretty printing --}
 
-instance Eq ParseTree where
-    t == t' = case compare t t' of
-        EQ -> True
-        _  -> False
+instance Show ParseTree where
+    show r = show' 0 r ++ "\n"
 
--- Pretty printing
--- Don't worry about it, there is nothing pretty about pretty printing
+show'              :: Int -> ParseTree -> String
+show' n Eps        = align n ++ "[ ]"
+show' n (Token tk) = align n ++ tk
+show' n (Seq t t') = show' n t ++ show' n t'
+show' n (Rule l t) = align n ++ "[." ++ l
+                                     ++ show' (n + 1) t ++ " ]"
 
--- Utility show functions
+-- Utility functions
 indent   :: Int -> String
-indent n = (concat . replicate n) "  "
+indent n = (concat . replicate n) "  " -- two white spaces for each level of
+                                       -- indentation
 
 align   :: Int -> String
 align n = "\n" ++ indent n
-
--- The structure of the definitions of indentShow and show, hopefully depicts
--- how the tree is displayed
-indentShow          :: Int -> [ParseTree] -> String
-indentShow n [ ]    = ""
-indentShow n (x:xs) = case x of
-    (Node l c) -> align n ++ "[." ++ l
-                          ++ indentShow (n + 1) c ++ " ]"
-                          ++ indentShow n xs
-    _          -> align n ++ show x ++ indentShow n xs
-
-instance Show ParseTree where
-    show Eps        = "[ ]"
-    show (Leaf tk)  = tk
-    show (Node l c) = "[." ++ l
-                           ++ indentShow 1 c ++ " ]"
