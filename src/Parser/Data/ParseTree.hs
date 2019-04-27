@@ -1,10 +1,6 @@
 module Parser.Data.ParseTree ( ParseTree(..)
                              , Label ) where
 
--- Some aliases, cause readability
-type Label = String
-type Tk    = String -- Tk stands for token
-
 -- A parse tree is composed of at least one of the following elements
 -- Eps:   represents an empty production;
 -- Token: it is a leaf node that corresponds to a grammar terminal. The
@@ -25,9 +21,11 @@ data ParseTree = Eps
                | Rule  Label Alt
                deriving (Ord, Eq)
 -- where
-type L   = ParseTree
-type R   = ParseTree
-type Alt = ParseTree
+type Tk    = String    -- Tk stands for token
+type L     = ParseTree
+type R     = ParseTree
+type Alt   = ParseTree
+type Label = String
 
 {-- Pretty printing;
  -- Don't worry about it, there is nothing pretty about pretty printing --}
