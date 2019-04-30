@@ -1,55 +1,82 @@
-module Parser.EBNF.Symbols (letter) where
+module Parser.EBNF.Symbols ( letter
+                           , decimalDigit
+                           , concatenateSymbol
+                           , alternativeSymbol
+                           , definingSymbol
+                           , startGroupSymbol
+                           , startOptionSymbol
+                           , startRepeatSymbol
+                           , endGroupSymbol
+                           , endOptionSymbol
+                           , endRepeatSymbol
+                           , singleQuoteSymbol
+                           , doubleQuoteSymbol
+                           , repetitionSymbol
+                           , terminatorSymbol
+                           , otherCharacter
+                           , spaceCharacter
+                           , horizontalTabulationCharacter
+                           , verticalTabulationCharacter
+                           , formFeed
+                           , newLine ) where
 
 import Parser.Combinators.Base
 
-letter =  t "a" <|> t "b" <|> t "c" <|> t "d" <|> t "e" <|> t "f" <|> t "g"
-      <|> t "h" <|> t "i" <|> t "j" <|> t "k" <|> t "l" <|> t "m" <|> t "n"
-      <|> t "o" <|> t "p" <|> t "q" <|> t "r" <|> t "s" <|> t "t"
-      <|> t "u" <|> t "v" <|> t "w" <|> t "x" <|> t "y" <|> t "z"
-      <|> t "A" <|> t "B" <|> t "C" <|> t "D" <|> t "E" <|> t "F" <|> t "G"
-      <|> t "H" <|> t "I" <|> t "J" <|> t "K" <|> t "L" <|> t "M" <|> t "N"
-      <|> t "O" <|> t "P" <|> t "Q" <|> t "R" <|> t "S" <|> t "T"
-      <|> t "U" <|> t "V" <|> t "W" <|> t "X" <|> t "Y" <|> t "Z"
+-- This module defines the ISO/IEC 646:1991 (according to the ISO/IEC 14977
+-- EBNF standart) 7 bit character set
 
-decimalDigit =  t "0" <|> t "1" <|> t "2" <|> t "3" <|> t "4"
-            <|> t "5" <|> t "6" <|> t "7" <|> t "8" <|> t "9"
+letter = rule "Letter"
+       [ t "a" , t "b" , t "c" , t "d" , t "e" , t "f" , t "g" , t "h" , t "i"
+       , t "j" , t "k" , t "l" , t "m" , t "n" , t "o" , t "p" , t "q" , t "r"
+       , t "s" , t "t" , t "u" , t "v" , t "w" , t "x" , t "y" , t "z"
+       , t "A" , t "B" , t "C" , t "D" , t "E" , t "F" , t "G" , t "H" , t "I"
+       , t "J" , t "K" , t "L" , t "M" , t "N" , t "O" , t "P" , t "Q" , t "R"
+       , t "S" , t "T" , t "U" , t "V" , t "W" , t "X" , t "Y" , t "Z" ]
 
-concatenateSymbol = t ","
+decimalDigit = rule "DecimalDigit"
+             [ t "0" , t "1" , t "2" , t "3" , t "4"
+             , t "5" , t "6" , t "7" , t "8" , t "9" ]
 
-alternativeSymbol = t "|" <|> t "/" <|> t "!"
+concatenateSymbol = rule "ConcatenateSymbol" [ t "," ]
+definingSymbol    = rule "DefiningSymbol"    [ t "=" ]
+alternativeSymbol = rule "AlternativeSymbol" [ t "|" , t "/" , t "!" ]
 
-startGroupSymbol  = t "("
-startOptionSymbol = t "[" <|> t "(/"
-startRepeatSymbol = t "{" <|> t "(:"
+startGroupSymbol  = rule "StartGroupSymbol"  [ t "(" ]
+startOptionSymbol = rule "StartOptionSymbol" [ t "[" , t "(/" ]
+startRepeatSymbol = rule "StartRepeatSymbol" [ t "{" , t "(:" ]
 
-endGroupSymbol  = t ")"
-endOptionSymbol = t "]" <|> t "/)"
-endRepeatSymbol = t "}" <|> t ":)"
+endGroupSymbol  = rule "EndGroupSymbol"  [ t ")" ]
+endOptionSymbol = rule "EndOptionSymbol" [ t "]" , t "/)" ]
+endRepeatSymbol = rule "EndRepeatSymbol" [ t "}" , t ":)" ]
 
-singleQuoteSymbol = t "'"
-doubleQuoteSymbol = t "\""
+singleQuoteSymbol = rule "SingleQuoteSymbol" [ t "'" ]
+doubleQuoteSymbol = rule "DoubleQuoteSymbol" [ t "\"" ]
 
-repeatSymbol = t "*"
+repetitionSymbol = rule "RepetitionSymbol" [ t "*" ]
 
-terminatorSymbol = t ";" <|> t "."
+terminatorSymbol = rule "TerminatorSymbol" [ t ";" , t "." ]
 
-otherCharacter =  spaceCharacter
-              <|> t ":" <|> t "+" <|> t "_" <|> t "%" <|> t "@" <|> t "&"
-              <|> t "#" <|> t "$" <|> t "<" <|> t ">" <|> t "\\" <|> t "~"
-              <|> t "`" <|> t "~"
+otherCharacter = rule "OtherCharacter"
+               [ spaceCharacter , t ":" , t "+" , t "_" , t "%" , t "@"
+               , t "&" , t "#" , t "$" , t "<" , t ">" , t "\\" , t "~"
+               , t "`" , t "~" ]
 
-spaceCharacter = t " "
+spaceCharacter = rule "SpaceCharacter" [ t " " ]
 
-horizontalTabulationCharacter = t "\t"
-verticalTabulationCharacter   = t "\v"
+-- Rules NewLine and CarriageReturnMany that are composed by more than just
+-- terminals are longest match parsers
+newLine = rule "NewLine"
+        [ carriageReturnMany +> t "\n" +> carriageReturnMany
+        , carriageReturnMany +> t "\n"
+        , t "\n" +> carriageReturnMany
+        , t "\n" ]
 
-formFeed = t "\f"
+carriageReturn     = rule "CarriageReturn" [ t "\r" ]
+carriageReturnMany = rule "CarriageReturnMany"
+                   [ carriageReturn +> carriageReturnMany
+                   , carriageReturn ]
 
-newLine =  t "\n"
-       <|> s "NewLine" [ carriageReturnMany, t "\n" ]
-       <|> s "NewLine" [ t "\n", carriageReturnMany ]
-       <|> s "NewLine" [ carriageReturnMany, t "\n", carriageReturnMany ]
+horizontalTabulationCharacter = rule "HorizontalTabulationCharacter" [ t "\t" ]
+verticalTabulationCharacter   = rule "VerticalTabulationCharacter"   [ t "\v" ]
 
-carriageReturn     = t "\r"
-carriageReturnMany = s "CarriageReturnMany"
-    [ carriageReturn , carriageReturnMany ]
+formFeed = rule "FormFeed" [ t "\f" ]
