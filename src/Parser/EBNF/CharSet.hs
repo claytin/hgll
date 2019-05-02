@@ -13,17 +13,17 @@ module Parser.EBNF.CharSet ( letter
                            , doubleQuoteSymbol
                            , repetitionSymbol
                            , terminatorSymbol
-                           , otherCharacter
-                           , spaceCharacter
-                           , horizontalTabulationCharacter
-                           , verticalTabulationCharacter
-                           , formFeed
-                           , newLine ) where
+                           , otherCharacter ) where
 
 import Parser.Combinators.Base
 
 -- This module defines the ISO/IEC 646:1991 (according to the ISO/IEC 14977
--- EBNF standart) 7 bit character set
+-- EBNF standard) 7 bit character set.
+--
+-- Note: this module does not define parsers for the special sequence symbol,
+-- except symbol, start/end comment symbol. This rules are not supported (or in
+-- any other way treated by this implementation, trying and use them will lead
+-- to parsing errors
 
 letter = rule "Letter"
        [ t "a" , t "b" , t "c" , t "d" , t "e" , t "f" , t "g" , t "h" , t "i"
@@ -61,6 +61,8 @@ otherCharacter = rule "OtherCharacter"
                , t "&" , t "#" , t "$" , t "<" , t ">" , t "\\" , t "~"
                , t "`" , t "~" ]
 
+-- The rules parsers bellow are not exported, at least for now, by this module.
+-- The reason being that gaps will be trimmed from the input
 spaceCharacter = rule "SpaceCharacter" [ t " " ]
 
 -- Rules NewLine and CarriageReturnMany that are composed by more than just
