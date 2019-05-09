@@ -6,6 +6,7 @@ module Parser.Combinators.Base ( Parser
                                , failure
                                , eps
                                , term, t
+                               , bind
                                , sqnc, (+>)
                                , rule ) where
 
