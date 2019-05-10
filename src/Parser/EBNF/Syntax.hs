@@ -1,4 +1,12 @@
-module Parser.EBNF.Syntax ( syntax ) where
+module Parser.EBNF.Syntax ( syntax
+                          -- the following exports should be removed, they are
+                          -- used for testing
+                          , emptySequence
+                          , syntacticPrimary
+                          , syntacticFactor 
+                          , singleDefinition
+                          , definitionList
+                          , syntaxRule ) where
 
 import Parser.Combinators.Base
 import Parser.EBNF.CharSet
@@ -21,7 +29,7 @@ definitionListMany = rule "DefinitionListMany"
                    , alternativeSymbol +> singleDefinition ]
 
 -- In the definition of the rule SingleDefinition syntacticTerm should replace
--- syntacticFactor, but we removed the first because of bad redundance
+-- syntacticFactor, but the first was removed because of "bad" redundance
 singleDefinition     = rule "SingleDefinition"
                      [ syntacticFactor +> singleDefinitionMany
                      , syntacticFactor ]
@@ -35,7 +43,7 @@ syntacticFactor = rule "SyntacticFactor"
                 , syntacticPrimary ]
 
 -- Note: the non-terminal emptySequence must come before metaIdentifier, since
--- the first is a meta identifier, but a special one, and it must be identified
+-- the first is a meta identifier, but a special one, and it must be recognized
 -- as such
 syntacticPrimary = rule "SyntacticPrimary"
                  [ optionalSequence
