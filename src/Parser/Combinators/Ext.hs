@@ -1,5 +1,5 @@
-module Parser.Combinators.Ext ( opt 
-                              , clojure
+module Parser.Combinators.Ext ( opt
+                              , clojure, star
                               , times, (*.) ) where
 
 import Parser.Combinators.Base
@@ -23,6 +23,9 @@ times n p = rule "Repetition" [ p' ]
         p' = p `bind`                 \x ->
              (n - 1) `times` p `bind` \y ->
              success $ Seq x y
+
+-- Aliases
+star = clojure
 
 infixl 0 *.  -- this may have to change
 (*.) = times
