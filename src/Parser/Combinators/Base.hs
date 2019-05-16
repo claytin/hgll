@@ -4,38 +4,40 @@ module Parser.Combinators.Base ( Parser
                                , parse
                                , success
                                , failure
-                               , eps
+                               , eps 
                                , term, t
                                , bind
                                , sqnc, (+>)
                                , rule ) where
 
 import Parser.Data.ParseTree
+import Parser.Data.Trie
 
 -- A Parser is a fuction from some Input string into a Res
-newtype Parser a = Parser (Input -> Res a)
+newtype Parser a = Parser ((Input, Memo a) -> (Res a, Memo a))
 -- where
+type Input  = String
+type Memo a = Trie a
 -- The result of applying a parser is Either, in case of success, a pair
 -- composed by a value of type a (in this implementation mostly a ParseTree),
 -- and the remainder of the input unconsuned by the parser. In case of failure
 -- the result is the input that the parser failed to consume
 type Res a = Either Input      -- failure
                     (a, Input) -- success
-type Input = String
 
 -- The parse function deconstructs and applies a parser
-parse            :: Parser a -> (Input -> Res a)
+parse            :: Parser a -> ((Input, Memo a) -> (Res a, Memo a))
 parse (Parser p) = p
 
-{-- Combinators --}
+-- Combinators --
 
 -- A parser that always succeeds for a given value
 success   :: a -> Parser a
-success v = Parser (\i -> Right (v, i))
+success v = Parser $ \(i, m) -> (Right (v, i), m)
 
 -- The complement of success, it always fails
 failure :: Parser a
-failure = Parser (\i -> Left i)
+failure = Parser $ \(i, m) -> (Left i, m)
 
 -- Parser that represents an empty production. The parser always succeeds with
 -- an "empty" ParseTree (see Parser.Data.ParseTree)
@@ -51,12 +53,12 @@ eps = success Eps
 -- grammar definition
 term    :: String -> Parser ParseTree
 term "" = error "Terminals must be non empty strings!"
-term s  = Parser $ \i ->
+term s  = Parser $ \(i, m) ->
     let n  = length s
         s' = take n i
         i' = drop n i
-    in if s == s' then Right (Token s', i')
-                  else Left i
+    in if s == s' then (Right (Token s', i'), m)
+                  else (Left i, m)
 
 -- Altough it returns a parser, i see this as more of a auxilarie function,
 -- very convinient for the implementation of sequencies and recursive patterns.
@@ -64,11 +66,11 @@ term s  = Parser $ \i ->
 -- the value returned by the parser p and carries it (binds) forward into its
 -- "scope". If any of the parsers, p or the one returned by f, fail, then bind
 -- also fails
-bind     :: Parser a -> (a -> Parser b) -> Parser b
-bind p f = Parser $ \i ->
-    case parse p i of
-        Right (v, i') -> parse (f v) i'
-        _             -> Left i
+bind     :: Parser a -> (a -> Parser a) -> Parser a
+bind p f = Parser $ \(i, m) ->
+    case parse p (i, m) of
+        (Right (v, i'), m') -> parse (f v) (i', m')
+        _                   -> (Left i, m)
 
 -- The sequence combinator is a function that takes two parsers and apply both
 -- of them, in order, from the left, to the given input by way of the bind
@@ -85,28 +87,29 @@ sqnc p q = p `bind` \x ->
 -- parse tree and "put it inside" a new Rule parse tree labeled by l. Every
 -- element of a grammar (except maybe for the start rule) must be an element
 -- of some rule, the label function just names what rule it is
-label                  :: Label -> Res ParseTree -> Res ParseTree
-label _ l@(Left _)     = l
-label l (Right (t, i)) = Right (Rule l t, i)
+--label                     :: Label
+--                          -> (Res ParseTree, Memo ParseTree)
+--                          -> (Res ParseTree, Memo ParseTree)
+label _ l@(Left _, _)     = l
+label l (Right (t, i), m) = (Right (Rule l t, i), m)
 
 -- A first match alternative combinator, the first of the alternatives to
 -- succeed is returned. It fails if none of the alternatives can parse the
 -- input
 rule        :: Label -> [Parser ParseTree] -> Parser ParseTree
 rule l []   = failure -- a rule must not be empty
-rule l alts = Parser (\i -> label l $ parse (each alts) i)
+rule l alts = Parser $ \(i, m) -> label l $ parse (each alts) (i, m)
     where
         -- each reduce the list of parsers by meas of orElse
         each = foldl1 orElse
         -- orElse takes two parsers at a time, if the (cur)rent one succeeds it
         -- returns the result, or else try the nxt one
-        cur `orElse` nxt = Parser $ \i ->
-            case parse cur i of
-                r@(Right _) -> r
-                _           -> parse nxt i
+        cur `orElse` nxt = Parser $ \(i, m) ->
+            case parse cur (i, m) of
+                r@(Right _, _) -> r
+                _              -> parse nxt (i, m)
 
-
-{-- Combinator aliases --}
+-- Aliases --
 t = term
 
 infixl 1 +>
