@@ -24,12 +24,11 @@ data ParseTree = Eps
 type Tk    = String    -- Tk stands for token
 type L     = ParseTree
 type R     = ParseTree
-type Alt   = ParseTree
 type Label = String
+type Alt   = ParseTree
 
-{-- Pretty printing;
- -- Don't worry about it, there is nothing pretty about pretty printing --}
-
+-- Pretty printing --
+-- Don't worry about it, there is nothing pretty about pretty printing
 instance Show ParseTree where
     show r = show' 0 r ++ "\n"
 
@@ -40,7 +39,6 @@ show' n (Seq t t') = show' n t ++ show' n t'
 show' n (Rule l t) = align n ++ "[." ++ l
                                      ++ show' (n + 1) t ++ " ]"
 
--- Utility functions
 indent   :: Int -> String
 indent n = (concat . replicate n) "  " -- two white spaces for each level of
                                        -- indentation
