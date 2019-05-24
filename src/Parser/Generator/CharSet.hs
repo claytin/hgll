@@ -16,38 +16,51 @@ module Parser.Generator.CharSet ( gLetter
                                 , gOtherCharacter ) where
 
 import Parser.Data.ParseTree
+import Parser.Generator.Util (gTerm, gStar)
 
 -- These imports are temporary, they are for testing only (f u ghci)
 import Parser.Combinators.Base
 import Parser.EBNF.CharSet
 
-unpack (Token tk) = tk
+gLetter (Rule "Letter" t) = gTerm t
 
-gLetter (Rule "Letter" t) = unpack t
-
-gDecimalDigit (Rule "DecimalDigit" t) = unpack t
+gDecimalDigit (Rule "DecimalDigit" t) = gTerm t
 
 gConcatenateSymbol (Rule "ConcatenateSymbol" t) = "+>"
-gDefiningSymbol    (Rule "DefiningSymbol" t)    = unpack t
+gDefiningSymbol    (Rule "DefiningSymbol" t)    = gTerm t
 gAlternativeSymbol (Rule "AlternativeSymbol" t) = ","
 
-gStartGroupSymbol  (Rule "StartGroupSymbol" t)  = unpack t
+gStartGroupSymbol  (Rule "StartGroupSymbol" t)  = gTerm t
 gStartOptionSymbol (Rule "StartOptionSymbol" t) = "("
 gStartRepeatSymbol (Rule "StartRepeatSymbol" t) = "("
 
-gEndGroupSymbol  (Rule "EndGroupSymbol" t)  = unpack t
+gEndGroupSymbol  (Rule "EndGroupSymbol" t)  = gTerm t
 gEndOptionSymbol (Rule "EndOptionSymbol" t) = ")"
 gEndRepeatSymbol (Rule "EndRepeatSymbol" t) = ")"
 
 gSingleQuoteSymbol (Rule "SingleQuoteSymbol" t) = "\""
-gDoubleQuoteSymbol (Rule "DoubleQuoteSymbol" t) = unpack t
+gDoubleQuoteSymbol (Rule "DoubleQuoteSymbol" t) = gTerm t
 
-gRepetitionSymbol (Rule "RepetitionSymbol" t) = ""
+gRepetitionSymbol (Rule "RepetitionSymbol" t) = "*."
 
 gTerminatorSymbol (Rule "TerminatorSymbol" t) = ""
 
 gOtherCharacter (Rule "OtherCharacter" t) = case t of
     (Rule _ _) -> gSpaceCharacter t
-    _          -> unpack t
+    _          -> gTerm t
 
-gSpaceCharacter (Rule "SpaceCharacter" t) = unpack t
+gSpaceCharacter (Rule "SpaceCharacter" t) = gTerm t
+
+gNewLine (Rule "NewLine" t) = case t of
+    (Seq (Seq l m) r) -> gStar gCarriageReturn l
+                      ++ gTerm m
+                      ++ gStar gCarriageReturn r
+
+gCarriageReturn (Rule "CarriageReturn" t) = gTerm t
+
+gHorizontalTabulationCharacter (Rule "HorizontalTabulationCharacter" t) =
+    gTerm t
+gVerticalTabulationCharacter   (Rule "VerticalTabulationCharacter" t) =
+    gTerm t
+
+gFormFeed (Rule "FormFeed" t) = gTerm t
