@@ -1,46 +1,25 @@
-module Parser.EBNF.Syntax ( syntax
-                          -- the following exports should be removed, they are
-                          -- used for testing
-                          , emptySequence
-                          , syntacticPrimary
-                          , syntacticFactor 
-                          , singleDefinition
-                          , definitionList
-                          , syntaxRule ) where
+module Parser.EBNF.Syntax ( syntax ) where
 
-import Parser.Combinators.Base
+import Parser.Combinators.Ext
 import Parser.EBNF.CharSet
 import Parser.EBNF.Words
 
-syntax         = rule "Syntax" [ syntaxRuleMany ]
-syntaxRuleMany = rule "SyntaxRuleMany"
-               [ syntaxRule +> syntaxRuleMany
-               , syntaxRule ]
-syntaxRule     = rule "SyntaxRule"
-               [ metaIdentifier +> definingSymbol +> definitionList
-                                                  +> terminatorSymbol ]
+syntax     = rule "Syntax" [ syntaxRule +> star syntaxRule ]
+syntaxRule = rule "SyntaxRule"
+           [ metaIdentifier +> definingSymbol
+                            +> definitionsList
+                            +> terminatorSymbol ]
 
-definitionList     = rule "DefinitionList"
-                   [ singleDefinition +> definitionListMany
-                   , singleDefinition ]
-definitionListMany = rule "DefinitionListMany"
-                   [ alternativeSymbol +> singleDefinition
-                                       +> definitionListMany
-                   , alternativeSymbol +> singleDefinition ]
+definitionsList = rule "DefinitionsList"
+    [ singleDefinition +> star (alternativeSymbol +> singleDefinition) ]
 
 -- In the definition of the rule SingleDefinition syntacticTerm should replace
 -- syntacticFactor, but the first was removed because of "bad" redundance
-singleDefinition     = rule "SingleDefinition"
-                     [ syntacticFactor +> singleDefinitionMany
-                     , syntacticFactor ]
-singleDefinitionMany = rule "SingleDefinitionMany"
-                     [ concatenateSymbol +> syntacticFactor
-                                         +> singleDefinitionMany
-                     , concatenateSymbol +> syntacticFactor ]
+singleDefinition = rule "SingleDefinition"
+    [ syntacticFactor +> star (concatenateSymbol +> syntacticFactor) ]
 
 syntacticFactor = rule "SyntacticFactor"
-                [ integer +> repetitionSymbol +> syntacticPrimary
-                , syntacticPrimary ]
+                [ opt (integer +> repetitionSymbol) +> syntacticPrimary ]
 
 -- Note: the non-terminal emptySequence must come before metaIdentifier, since
 -- the first is a meta identifier, but a special one, and it must be recognized
@@ -54,13 +33,15 @@ syntacticPrimary = rule "SyntacticPrimary"
                  , terminalString ]
 
 optionalSequence = rule "OptionalSequence"
-                 [ startOptionSymbol +> definitionList +> endOptionSymbol ]
+                 [ startOptionSymbol +> definitionsList +> endOptionSymbol ]
 
 repeatedSequence = rule "RepeatedSequence"
-                 [ startRepeatSymbol +> definitionList +> endRepeatSymbol ]
+                 [ startRepeatSymbol +> definitionsList +> endRepeatSymbol ]
 
 groupedSequence = rule "GroupedSequence"
-                 [ startGroupSymbol +> definitionList +> endGroupSymbol ]
+                 [ startGroupSymbol +> definitionsList +> endGroupSymbol ]
 
--- This does not correspond to the ISO EBNF standard
+-- This does not correspond to the ISO EBNF standard, but it is necessary
+-- because it is "not possible" to determin if there is an empty production,
+-- otherwise
 emptySequence = rule "EmptySequence" [ t "eps" ]

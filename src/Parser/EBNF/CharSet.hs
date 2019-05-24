@@ -15,7 +15,7 @@ module Parser.EBNF.CharSet ( letter
                            , terminatorSymbol
                            , otherCharacter ) where
 
-import Parser.Combinators.Base
+import Parser.Combinators.Ext
 
 -- This module defines the ISO/IEC 646:1991 (according to the ISO/IEC 14977
 -- EBNF standard) 7 bit character set.
@@ -61,24 +61,31 @@ otherCharacter = rule "OtherCharacter"
                , t "&" , t "#" , t "$" , t "<" , t ">" , t "\\" , t "~"
                , t "`" , t "~" ]
 
--- The rules parsers bellow are not exported, at least for now, by this module.
--- The reason being that gaps will be trimmed from the input
+-- The parsers bellow are not exported, at least for now. The reason being that
+-- gaps are not used by the EBNF meta syntax, and are trimmed from the input
 spaceCharacter = rule "SpaceCharacter" [ t " " ]
 
--- Rules NewLine and CarriageReturnMany that are composed by more than just
--- terminals are longest match parsers
 newLine = rule "NewLine"
-        [ carriageReturnMany +> t "\n" +> carriageReturnMany
-        , carriageReturnMany +> t "\n"
-        , t "\n" +> carriageReturnMany
-        , t "\n" ]
+        [ star carriageReturn +> t "\n" +> star carriageReturn ]
 
-carriageReturn     = rule "CarriageReturn" [ t "\r" ]
-carriageReturnMany = rule "CarriageReturnMany"
-                   [ carriageReturn +> carriageReturnMany
-                   , carriageReturn ]
+carriageReturn = rule "CarriageReturn" [ t "\r" ]
 
 horizontalTabulationCharacter = rule "HorizontalTabulationCharacter" [ t "\t" ]
 verticalTabulationCharacter   = rule "VerticalTabulationCharacter"   [ t "\v" ]
 
 formFeed = rule "FormFeed" [ t "\f" ]
+
+-- The following functions are kept in the src as example of how the extended
+-- combinators improve the writing/reading of grammars. This is how the NewLine
+-- rule was written before adopting the use of Parser.Combinators.Ext
+
+--newLine = rule "NewLine"
+--        [ carriageReturnMany +> t "\n" +> carriageReturnMany
+--        , carriageReturnMany +> t "\n"
+--        , t "\n" +> carriageReturnMany
+--        , t "\n" ]
+
+--carriageReturn     = rule "CarriageReturn" [ t "\r" ]
+--carriageReturnMany = rule "CarriageReturnMany"
+--                   [ carriageReturn +> carriageReturnMany
+--                   , carriageReturn ]

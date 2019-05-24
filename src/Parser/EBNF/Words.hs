@@ -2,18 +2,16 @@ module Parser.EBNF.Words ( terminalString
                          , metaIdentifier
                          , integer ) where
 
-import Parser.Combinators.Base
+import Parser.Combinators.Ext
 import Parser.EBNF.CharSet
 
 terminalString = rule "TerminalString"
-               [ singleQuoteSymbol +> firstTerminalCharacterMany
+               [ singleQuoteSymbol +> firstTerminalCharacter
+                                   +> star firstTerminalCharacter
                                    +> singleQuoteSymbol
-               , doubleQuoteSymbol +> secondTerminalCharacterMany
+               , doubleQuoteSymbol +> secondTerminalCharacter
+                                   +> star secondTerminalCharacter
                                    +> doubleQuoteSymbol ]
-
-firstTerminalCharacterMany = rule "FirstTerminalCharacterMany"
-    [ firstTerminalCharacter +> firstTerminalCharacterMany
-    , firstTerminalCharacter ]
 
 firstTerminalCharacter = rule "FirstTerminalCharacter"
                        [ letter
@@ -31,10 +29,6 @@ firstTerminalCharacter = rule "FirstTerminalCharacter"
                        , repetitionSymbol
                        , terminatorSymbol
                        , otherCharacter ]
-
-secondTerminalCharacterMany = rule "SecondTerminalCharacterMany"
-    [ secondTerminalCharacter +> secondTerminalCharacterMany
-    , secondTerminalCharacter ]
 
 secondTerminalCharacter = rule "SecondTerminalCharacter"
                         [ letter
@@ -54,19 +48,10 @@ secondTerminalCharacter = rule "SecondTerminalCharacter"
                         , otherCharacter ]
 
 metaIdentifier = rule "MetaIdentifier"
-               [ letter +> metaIdentifierCharacterMany
-               , letter ]
-
-metaIdentifierCharacterMany = rule "MetaIdentifierCharacterMany"
-    [ metaIdentifierCharacter +> metaIdentifierCharacterMany
-    , metaIdentifierCharacter ]
+               [ letter +> star metaIdentifierCharacter ]
 
 metaIdentifierCharacter = rule "MetaIdentifierCharacter"
                         [ letter
                         , decimalDigit ]
 
--- Integer and DecimalDigitMany are redundant, but i like this redundance
-integer          = rule "Integer" [ decimalDigitMany ]
-decimalDigitMany = rule "DecimalDigitMany"
-                 [ decimalDigit +> decimalDigitMany
-                 , decimalDigit ]
+integer = rule "Integer" [ decimalDigit +> star decimalDigit ]
