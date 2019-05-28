@@ -1,5 +1,6 @@
 module Parser.Generator ( gen ) where
 
+import Parser.Types
 import Parser.Combinators.Base (parse)
 
 import Parser.Generator.Syntax
