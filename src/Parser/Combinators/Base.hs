@@ -1,41 +1,16 @@
--- TODO!
--- 1. Maybe add some more type aliases, it is getting hard to cope with the
--- type signatures;
--- 2. Add new comment for the Parser type;
--- 3. Maybe the memo function should be separated from the combinators;
--- 4. Remove commented code
-module Parser.Combinators.Base ( Parser(..)
-                               , Input
-                               , parse
+module Parser.Combinators.Base ( parse
                                , success
                                , failure
                                , eps
                                , term, t
                                , sqnc, (+>)
-                               , rule ) where
+                               , rule, (=|>) ) where
 
-import Parser.Data.ParseTree
-
--- About the Parser type.
--- Add comment here ...
-newtype Parser a = Parser (Input -> [(a, Input)])
---newtype Parser a = Parser (Input -> Memo (Res a) -> (Res a, Memo (Res a)))
--- where
---type Memo a = Trie a
-type Input  = String
+import Parser.Types
 
 -- The parse function deconstructs and applies a parser
---parse            :: Parser a -> (Input -> Memo (Res a) -> (Res a, Memo (Res a)))
-parse            :: Parser a -> (Input -> [(a, Input)])
+parse            :: Parser a -> (Input -> [Res a])
 parse (Parser p) = p
-
---memo :: Parser a -> Parser a
---memo p = Parser $ \i m ->
---    case fetch i m of
---        Just v -> (v, m)
---        _      -> let (v, m') = parse p i m
---                      m''     = add i v m'
---                   in (v, m'')
 
 -- Combinators --
 -- A parser that always succeeds for a given value
@@ -68,12 +43,6 @@ term s  = Parser $ \i ->
         i' = drop n i
      in if s == s' then [(Token s', i')]
                    else [ ]
---term s  = memo $ Parser $ \i m ->
---    let n  = length s
---        s' = take n i
---        i' = drop n i
---    in if s == s' then (Right (Token s', i'), m)
---                  else (Left i, m)
 
 -- Altough it returns a parser, i see this as more of a auxilarie function,
 -- very convinient for the implementation of sequencies and recursive patterns.
@@ -102,8 +71,6 @@ sqnc p q = p `bind` \x ->
 label               :: Label -> [(ParseTree, Input)] -> [(ParseTree, Input)]
 label _ [ ]         = [ ]
 label l ((t, i):xs) = (Rule l t, i):label l xs
---label _ l@(Left _, _)     = l
---label l (Right (t, i), m) = (Right (Rule l t, i), m)
 
 -- A first match alternative combinator, the first of the alternatives to
 -- succeed is returned. It fails if none of the alternatives can parse the
@@ -125,3 +92,8 @@ t = term
 -- is equivalent to (a +> b) +> c
 infixl 1 +>
 (+>) = sqnc
+
+-- This fixity definition of rule is as follows so that it stays close to
+-- its function form
+infix 9 =|>
+(=|>) = rule
