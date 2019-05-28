@@ -36,10 +36,9 @@ mainParse args = putStrLn "parse"
 mainGen      :: [String] -> IO ()
 mainGen args = do
     parser <- withFile (args !! 0) ReadMode $ \inputFile -> do
-        gramm <- hGetContents inputFile
-        let noGapsGramm = (concat . words) gramm
+        grammSrc <- hGetContents inputFile
+        let noGapsGramm = (concat . words) grammSrc
         case gen noGapsGramm of
             Right s -> return s
             Left  e -> return e
     putStr parser
-
