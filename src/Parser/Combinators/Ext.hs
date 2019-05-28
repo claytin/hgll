@@ -1,13 +1,13 @@
 -- TODO!
 -- 1. Add some comments
 module Parser.Combinators.Ext ( module Parser.Combinators.Base
-                              , rule'
+                              , rule', (=!>)
                               , opt
                               , clojure, star
                               , times, (*.) ) where
 
+import Parser.Types
 import Parser.Combinators.Base
-import Parser.Data.ParseTree
 
 rule'        :: Label -> [Parser ParseTree] -> Parser ParseTree
 rule' l []   = failure -- a rule must not be empty
@@ -38,3 +38,7 @@ star = clojure
 -- set to one, repetition must have a higher precedence
 infixl 2 *.
 (*.) = times
+
+-- See rule fixity definition in Parser.Combinators.Base
+infix 9 =!>
+(=!>) = rule'
