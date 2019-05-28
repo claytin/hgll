@@ -2,14 +2,11 @@
 -- 1. Add spaces for readability, it may also help Haskell not to get confused
 module Parser.Generator.Syntax ( gSyntax ) where
 
-import Parser.Data.ParseTree
+import Parser.Types
 import Parser.Generator.Words
 import Parser.Generator.CharSet
-import Parser.Generator.Util (gTerm, gOpt, gStar)
 
--- These imports are for testing only (cause f u ghci), they must be commented
-import Parser.Combinators.Ext
-import Parser.EBNF.Syntax
+import Parser.Generator.Util (gTerm, gOpt, gStar)
 
 gSyntax (Rule "Syntax" t) = case t of
     (Seq l r) -> gSyntaxRule l ++ gStar gSyntaxRule r

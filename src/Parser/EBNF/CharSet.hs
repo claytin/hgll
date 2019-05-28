@@ -15,6 +15,7 @@ module Parser.EBNF.CharSet ( letter
                            , terminatorSymbol
                            , otherCharacter ) where
 
+import Parser.Types
 import Parser.Combinators.Ext
 
 -- This module defines the ISO/IEC 646:1991 (according to the ISO/IEC 14977

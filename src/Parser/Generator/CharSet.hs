@@ -15,12 +15,9 @@ module Parser.Generator.CharSet ( gLetter
                                 , gTerminatorSymbol
                                 , gOtherCharacter ) where
 
-import Parser.Data.ParseTree
-import Parser.Generator.Util (gTerm, gStar)
+import Parser.Types
 
--- These imports are temporary, they are for testing only (f u ghci)
-import Parser.Combinators.Base
-import Parser.EBNF.CharSet
+import Parser.Generator.Util (gTerm, gStar)
 
 gLetter (Rule "Letter" t) = gTerm t
 

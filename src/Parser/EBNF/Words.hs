@@ -2,7 +2,9 @@ module Parser.EBNF.Words ( terminalString
                          , metaIdentifier
                          , integer ) where
 
+import Parser.Types
 import Parser.Combinators.Ext
+
 import Parser.EBNF.CharSet
 
 terminalString = rule "TerminalString"

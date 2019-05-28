@@ -2,13 +2,10 @@ module Parser.Generator.Words ( gTerminalString
                               , gMetaIdentifier
                               , gInteger ) where
 
-import Parser.Data.ParseTree
+import Parser.Types
 import Parser.Generator.CharSet
-import Parser.Generator.Util (gStar)
 
--- These imports are for testing only (cause f u ghci), they must be commented
-import Parser.Combinators.Ext
-import Parser.EBNF.Words
+import Parser.Generator.Util (gStar)
 
 gTerminalString (Rule "TerminalString" t) = case t of
     (Seq (Seq (Seq a@(Rule "SingleQuoteSymbol"_) b) c) e) ->

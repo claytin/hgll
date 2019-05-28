@@ -1,6 +1,8 @@
 module Parser.EBNF.Syntax ( syntax ) where
 
+import Parser.Types
 import Parser.Combinators.Ext
+
 import Parser.EBNF.CharSet
 import Parser.EBNF.Words
 
