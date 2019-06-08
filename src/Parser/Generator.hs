@@ -1,12 +1,11 @@
 module Parser.Generator ( gen ) where
 
-import Parser.Types
-import Parser.Combinators.Base (parse)
+import Parser.Traits
 
-import Parser.Generator.Syntax
 import Parser.EBNF.Syntax
+import Parser.Generator.Syntax
 
-gen   :: String -> Either String String
-gen i = case parse syntax i of
-    [ ]      -> Left  $ "Parser failed. Aborting!\n"
-    [(t, i)] -> Right $ gSyntax t
+gen   :: String -> Maybe String
+gen i = case fullParse syntax i of
+    [ ] -> Nothing
+    [t] -> Just $ gSyntax t
