@@ -2,10 +2,10 @@ module Parser.Generator.Words ( gTerminalString
                               , gMetaIdentifier
                               , gInteger ) where
 
-import Parser.Types
-import Parser.Generator.CharSet
-
+import Parser.Data.ParseTree
 import Parser.Generator.Util (gStar)
+
+import Parser.Generator.CharSet
 
 gTerminalString (Rule "TerminalString" t) = case t of
     (Seq (Seq (Seq a@(Rule "SingleQuoteSymbol"_) b) c) e) ->
