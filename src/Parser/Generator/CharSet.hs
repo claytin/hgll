@@ -15,17 +15,16 @@ module Parser.Generator.CharSet ( gLetter
                                 , gTerminatorSymbol
                                 , gOtherCharacter ) where
 
-import Parser.Types
-
+import Parser.Data.ParseTree
 import Parser.Generator.Util (gTerm, gStar)
 
 gLetter (Rule "Letter" t) = gTerm t
 
 gDecimalDigit (Rule "DecimalDigit" t) = gTerm t
 
-gConcatenateSymbol (Rule "ConcatenateSymbol" t) = "+>"
+gConcatenateSymbol (Rule "ConcatenateSymbol" t) = "#"
 gDefiningSymbol    (Rule "DefiningSymbol" t)    = gTerm t
-gAlternativeSymbol (Rule "AlternativeSymbol" t) = ","
+gAlternativeSymbol (Rule "AlternativeSymbol" t) = "<|>"
 
 gStartGroupSymbol  (Rule "StartGroupSymbol" t)  = gTerm t
 gStartOptionSymbol (Rule "StartOptionSymbol" t) = "("
