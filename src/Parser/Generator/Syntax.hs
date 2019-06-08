@@ -1,12 +1,14 @@
 -- TODO
 -- 1. Add spaces for readability, it may also help Haskell not to get confused
+-- 2. Can some identation be implemented?
 module Parser.Generator.Syntax ( gSyntax ) where
 
-import Parser.Types
+import Parser.Data.ParseTree
+import Parser.Generator.Util (gTerm, gOpt, gStar)
+
 import Parser.Generator.Words
 import Parser.Generator.CharSet
 
-import Parser.Generator.Util (gTerm, gOpt, gStar)
 
 gSyntax (Rule "Syntax" t) = case t of
     (Seq l r) -> gSyntaxRule l ++ gStar gSyntaxRule r
@@ -14,8 +16,8 @@ gSyntax (Rule "Syntax" t) = case t of
 gSyntaxRule (Rule "SyntaxRule" t) = case t of
     (Seq (Seq (Seq l m) n) r) -> gMetaIdentifier l
                               ++ gDefiningSymbol m
-                              ++ "rule \"" ++ gMetaIdentifier l ++ "\" "
-                              ++ "[" ++ gDefinitionsList n ++ "]"
+                              ++ " \"" ++ gMetaIdentifier l ++ "\" =|> "
+                              ++ gDefinitionsList n
                               ++ gTerminatorSymbol r ++ "\n"
 
 gDefinitionsList (Rule "DefinitionsList" t) = case t of
@@ -44,21 +46,21 @@ gSyntacticPrimary (Rule "SyntacticPrimary" t) = case t of
 gOptionalSequence (Rule "OptionalSequence" t) = case t of
     (Seq (Seq l m) r) -> "opt "
                       ++ gStartOptionSymbol l
-                      ++ "rule \"OptionalSequence\" "
-                      ++ "[" ++ gDefinitionsList m ++ "]"
+                      ++ "\"OptionalSequence\" =|> "
+                      ++ gDefinitionsList m
                       ++ gEndOptionSymbol r
 
 gRepeatedSequence (Rule "RepeatedSequence" t) = case t of
     (Seq (Seq l m) r) -> "star "
                       ++ gStartRepeatSymbol l
-                      ++ "rule \"RepeatedSequence\" "
-                      ++ "[" ++ gDefinitionsList m ++ "]"
+                      ++ "\"RepeatedSequence\" =|> "
+                      ++ gDefinitionsList m
                       ++ gEndRepeatSymbol r
 
 gGroupedSequence (Rule "GroupedSequence" t) = case t of
     (Seq (Seq l m) r) -> gStartGroupSymbol l
-                      ++ "rule \"GroupedSequence\" "
-                      ++ "[" ++ gDefinitionsList m ++ "]"
+                      ++ "\"GroupedSequence\" =|> "
+                      ++ gDefinitionsList m
                       ++ gEndGroupSymbol r
 
 gEmptySequence (Rule "EmptySequence" t) = gTerm t
