@@ -26,7 +26,6 @@ instance Monad (KP m) where
 
 instance GrammO m => GrammO (KP m) where
     -- (<:>) :: (KP m) a -> (KP m) b -> (KP m) (a, b)
-    --KP p <:> KP q = KP $ \k -> p k <:> q k
     p <:> q = do a <- p
                  b <- q
                  return (a, b)
