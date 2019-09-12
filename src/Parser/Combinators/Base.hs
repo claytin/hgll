@@ -30,7 +30,7 @@ eps = success Eps
 -- content (value) is allowed. ISO EBNF standard defines strings as the only
 -- terminal elements
 term    :: String -> Std ParseTree
-term "" = error "Terminals must be non empty strings!"
+term "" = error "Terminals must be non-empty strings!"
 term s  = Std $ \i ->
     let n  = length s
         s' = take n i
@@ -42,7 +42,6 @@ term s  = Std $ \i ->
 -- of them, in order, from the left, to the given input
 sqnc     :: Std ParseTree -> Std ParseTree -> Std ParseTree
 sqnc p q = p <:> q >>= \(x, y) -> return $ Seq x y
-
 
 -- The rule function is more of a wrapper function. It takes a label, which
 -- will identify a set of alternatives alts. Even though alts is a single
