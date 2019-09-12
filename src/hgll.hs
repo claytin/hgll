@@ -39,6 +39,6 @@ mainGen args = do
         grammSrc <- hGetContents inputFile
         let noGapsGramm = (concat . words) grammSrc
         case gen noGapsGramm of
-            Right s -> return s
-            Left  e -> return e
+            Just s -> return s
+            _      -> return "Well ... f*!"
     putStr parser
