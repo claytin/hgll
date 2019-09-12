@@ -19,12 +19,12 @@ instance Parser Std where
 instance Monad Std where
     -- return :: a -> Std a
     return a    = Std $ \i -> [(i, a)]
-    -- (>>=) Std a -> (a -> Std b) -> Std b
-    Std p >>= f = Std $ \i -> concat [ q i' | (i', a) <- p i
-                                            , let Std q = f a ]
+    -- (>>=) :: Std a -> (a -> Std b) -> Std b
+    Std p >>= f = Std $ \i ->
+        concat [ q i' | (i', a) <- p i , let Std q = f a ]
 
 instance GrammO Std where
-    -- (<:>)  :: Std a -> Std b -> Std (a, b)
+    -- (<:>) :: Std a -> Std b -> Std (a, b)
     p <:> q = do a <- p
                  b <- q
                  return (a, b)
