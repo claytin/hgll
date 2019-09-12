@@ -1,7 +1,18 @@
 module Parser.Generator.Util ( gTerm
                              , gOpt
-                             , gClojure, gStar
-                             , gTimes ) where
+                             , gClosure, gStar
+                             , gTimes
+                             , cQuoteSym
+                             , cOSSeqSym
+                             , cCSSeqSym
+                             , cTermOp
+                             , cAltOp
+                             , cSeqOp
+                             , cRuleDefOp
+                             , cRuleTermSym
+                             , ecRepOp
+                             , ecOptOp
+                             , ecClosureOp ) where
 
 import Parser.Data.ParseTree
 
@@ -17,10 +28,10 @@ gOpt g t = case t of
     Eps                  -> ""
     _                    -> g t
 
-gClojure     :: (ParseTree -> String) -> ParseTree -> String
-gClojure g t = case t of
-    (Rule "Clojure" t') -> gClojure g t'
-    (Seq l r)           -> g l ++ gClojure g r
+gClosure     :: (ParseTree -> String) -> ParseTree -> String
+gClosure g t = case t of
+    (Rule "Closure" t') -> gClosure g t'
+    (Seq l r)           -> g l ++ gClosure g r
     Eps                 -> ""
 
 gTimes       :: Int -> (ParseTree -> String) -> ParseTree -> String
@@ -30,5 +41,39 @@ gTimes n g t = case t of
     (Rule "Repetition" t') -> gTimes n g t'
     (Seq l r)              -> g l ++ gTimes (n - 1) g r
 
+-- Combinator generation operators and symbols
+cQuoteSym :: String
+cQuoteSym = "\""
+
+cOSSeqSym :: String
+cOSSeqSym = "("
+
+cCSSeqSym :: String
+cCSSeqSym = ")"
+
+cTermOp :: String
+cTermOp = "t "
+
+cAltOp :: String
+cAltOp = " <|> "
+
+cSeqOp :: String
+cSeqOp = " # "
+
+cRuleDefOp :: String
+cRuleDefOp = " =|> "
+
+cRuleTermSym :: String
+cRuleTermSym = "\n"
+
+ecRepOp :: String
+ecRepOp = " *. "
+
+ecOptOp :: String
+ecOptOp = "opt "
+
+ecClosureOp :: String
+ecClosureOp = "closure "
+
 -- Aliases --
-gStar = gClojure
+gStar = gClosure
