@@ -10,27 +10,29 @@ import Parser.Combinators.ExtK
 import Parser.EBNF.CharSet
 
 terminalString = "TerminalString" =!>
-                  singleQuoteSymbol # firstTerminalCharacter
-                                    # star firstTerminalCharacter
-                                    # singleQuoteSymbol
-              <|> doubleQuoteSymbol # secondTerminalCharacter
+                  firstQuoteSymbol # firstTerminalCharacter
+                                   # star firstTerminalCharacter
+                                   # firstQuoteSymbol
+              <|> secondQuoteSymbol # secondTerminalCharacter
                                     # star secondTerminalCharacter
-                                    # doubleQuoteSymbol
+                                    # secondQuoteSymbol
 
 firstTerminalCharacter = "FirstTerminalCharacter" =!>
                           letter
                       <|> decimalDigit
                       <|> concatenateSymbol
-                      <|> alternativeSymbol
                       <|> definingSymbol
-                      <|> startGroupSymbol
-                      <|> startOptionSymbol
-                      <|> startRepeatSymbol
+                      <|> alternativeSymbol
                       <|> endGroupSymbol
                       <|> endOptionSymbol
                       <|> endRepeatSymbol
-                      <|> doubleQuoteSymbol
+                      <|> exceptSymbol
                       <|> repetitionSymbol
+                      <|> secondQuoteSymbol
+                      <|> specialSequenceSymbol
+                      <|> startGroupSymbol
+                      <|> startOptionSymbol
+                      <|> startRepeatSymbol
                       <|> terminatorSymbol
                       <|> otherCharacter
 
@@ -38,16 +40,18 @@ secondTerminalCharacter = "SecondTerminalCharacter" =!>
                            letter
                        <|> decimalDigit
                        <|> concatenateSymbol
-                       <|> alternativeSymbol
                        <|> definingSymbol
-                       <|> startGroupSymbol
-                       <|> startOptionSymbol
-                       <|> startRepeatSymbol
+                       <|> alternativeSymbol
                        <|> endGroupSymbol
                        <|> endOptionSymbol
                        <|> endRepeatSymbol
-                       <|> singleQuoteSymbol
+                       <|> exceptSymbol
+                       <|> firstQuoteSymbol
                        <|> repetitionSymbol
+                       <|> specialSequenceSymbol
+                       <|> startGroupSymbol
+                       <|> startOptionSymbol
+                       <|> startRepeatSymbol
                        <|> terminatorSymbol
                        <|> otherCharacter
 
