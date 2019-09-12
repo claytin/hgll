@@ -1,7 +1,7 @@
 module Parser.Combinators.Ext ( module Parser.Combinators.Base
                               , rule', (=!>)
                               , opt
-                              , clojure, star
+                              , closure, star
                               , times, (*.) ) where
 
 import Parser.Instance.Std
@@ -26,12 +26,12 @@ rule' l alts = Std $ \i ->
 opt   :: Std ParseTree -> Std ParseTree
 opt p = "Optional" =!> p <|> eps
 
--- Similar to opt, except that clojure represents a unbount sequence of matches
+-- Similar to opt, except that closure represents a unbount sequence of matches
 -- of the pattern described by p
-clojure   :: Std ParseTree -> Std ParseTree
-clojure p = "Clojure" =!> p' <|> eps
+closure   :: Std ParseTree -> Std ParseTree
+closure p = "Closure" =!> p' <|> eps
     where
-        p' = p # clojure p
+        p' = p # closure p
 
 -- The times combinator defines a finite sequence, of exactly n, matches of the
 -- pattern described by p
@@ -43,7 +43,7 @@ times n p = "Repetition" =!> p'
         p' = p # (n - 1) *. p
 
 -- Aliases --
-star = clojure
+star = closure
 
 -- The highest precedence on the set of EBNF operators
 infixl 4 *.
