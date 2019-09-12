@@ -9,37 +9,37 @@ module Parser.Generator.CharSet ( gLetter
                                 , gEndGroupSymbol
                                 , gEndOptionSymbol
                                 , gEndRepeatSymbol
-                                , gSingleQuoteSymbol
-                                , gDoubleQuoteSymbol
+                                , gFirstQuoteSymbol
+                                , gSecondQuoteSymbol
+                                , gExceptSymbol
+                                , gSpecialSequenceSymbol
                                 , gRepetitionSymbol
                                 , gTerminatorSymbol
                                 , gOtherCharacter ) where
 
 import Parser.Data.ParseTree
+
 import Parser.Generator.Util (gTerm, gStar)
 
 gLetter (Rule "Letter" t) = gTerm t
 
 gDecimalDigit (Rule "DecimalDigit" t) = gTerm t
 
-gConcatenateSymbol (Rule "ConcatenateSymbol" t) = "#"
-gDefiningSymbol    (Rule "DefiningSymbol" t)    = gTerm t
-gAlternativeSymbol (Rule "AlternativeSymbol" t) = "<|>"
-
-gStartGroupSymbol  (Rule "StartGroupSymbol" t)  = gTerm t
-gStartOptionSymbol (Rule "StartOptionSymbol" t) = "("
-gStartRepeatSymbol (Rule "StartRepeatSymbol" t) = "("
-
-gEndGroupSymbol  (Rule "EndGroupSymbol" t)  = gTerm t
-gEndOptionSymbol (Rule "EndOptionSymbol" t) = ")"
-gEndRepeatSymbol (Rule "EndRepeatSymbol" t) = ")"
-
-gSingleQuoteSymbol (Rule "SingleQuoteSymbol" t) = "\""
-gDoubleQuoteSymbol (Rule "DoubleQuoteSymbol" t) = gTerm t
-
-gRepetitionSymbol (Rule "RepetitionSymbol" t) = "*."
-
-gTerminatorSymbol (Rule "TerminatorSymbol" t) = ""
+gConcatenateSymbol     (Rule "ConcatenateSymbol" t)     = gTerm t
+gDefiningSymbol        (Rule "DefiningSymbol" t)        = gTerm t
+gAlternativeSymbol     (Rule "AlternativeSymbol" t)     = gTerm t
+gEndGroupSymbol        (Rule "EndGroupSymbol" t)        = gTerm t
+gEndOptionSymbol       (Rule "EndOptionSymbol" t)       = gTerm t
+gEndRepeatSymbol       (Rule "EndRepeatSymbol" t)       = gTerm t
+gFirstQuoteSymbol      (Rule "FirstQuoteSymbol" t)      = gTerm t
+gRepetitionSymbol      (Rule "RepetitionSymbol" t)      = gTerm t
+gSecondQuoteSymbol     (Rule "SecondQuoteSymbol" t)     = "\\\""
+gExceptSymbol          (Rule "ExceptSymbol" t)          = gTerm t
+gSpecialSequenceSymbol (Rule "SpecialSequenceSymbol" t) = gTerm t
+gStartGroupSymbol      (Rule "StartGroupSymbol" t)      = gTerm t
+gStartOptionSymbol     (Rule "StartOptionSymbol" t)     = gTerm t
+gStartRepeatSymbol     (Rule "StartRepeatSymbol" t)     = gTerm t
+gTerminatorSymbol      (Rule "TerminatorSymbol" t)      = gTerm t
 
 gOtherCharacter (Rule "OtherCharacter" t) = case t of
     (Rule _ _) -> gSpaceCharacter t
