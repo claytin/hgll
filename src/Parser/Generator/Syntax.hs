@@ -4,7 +4,7 @@
 module Parser.Generator.Syntax ( gSyntax ) where
 
 import Parser.Data.ParseTree
-import Parser.Generator.Util (gTerm, gOpt, gStar)
+import Parser.Generator.Util
 
 import Parser.Generator.Words
 import Parser.Generator.CharSet
@@ -14,26 +14,27 @@ gSyntax (Rule "Syntax" t) = case t of
     (Seq l r) -> gSyntaxRule l ++ gStar gSyntaxRule r
 
 gSyntaxRule (Rule "SyntaxRule" t) = case t of
-    (Seq (Seq (Seq l m) n) r) -> gMetaIdentifier l
-                              ++ gDefiningSymbol m
-                              ++ " \"" ++ gMetaIdentifier l ++ "\" =|> "
+    (Seq (Seq (Seq l m) n) _) -> gMetaIdentifier l
+                              ++ " " ++ gDefiningSymbol m
+                              ++ " \"" ++ gMetaIdentifier l ++ "\""
+                              ++ cRuleDefOp
                               ++ gDefinitionsList n
-                              ++ gTerminatorSymbol r ++ "\n"
+                              ++ cRuleTermSym
 
 gDefinitionsList (Rule "DefinitionsList" t) = case t of
     (Seq l r) -> gSingleDefinition l ++ gStar list r
         where
-            list (Seq s d) = gAlternativeSymbol s ++ gSingleDefinition d
+            list (Seq _ d) = cAltOp ++ gSingleDefinition d
 
 gSingleDefinition (Rule "SingleDefinition" t) = case t of
     (Seq l r) -> gSyntacticFactor l ++ gStar def r
         where
-            def (Seq s f) = gConcatenateSymbol s ++ gSyntacticFactor f
+            def (Seq _ f) = cSeqOp ++ gSyntacticFactor f
 
 gSyntacticFactor (Rule "SyntacticFactor" t) = case t of
     (Seq l r) -> gOpt nTimes l ++ gSyntacticPrimary r
         where
-            nTimes (Seq n s) = gInteger n ++ gRepetitionSymbol s
+            nTimes (Seq n _) = gInteger n ++ ecRepOp
 
 gSyntacticPrimary (Rule "SyntacticPrimary" t) = case t of
      (Rule "OptionalSequence" _) -> gOptionalSequence t
@@ -44,23 +45,15 @@ gSyntacticPrimary (Rule "SyntacticPrimary" t) = case t of
      (Rule "TerminalString" _)   -> gTerminalString t
 
 gOptionalSequence (Rule "OptionalSequence" t) = case t of
-    (Seq (Seq l m) r) -> "opt "
-                      ++ gStartOptionSymbol l
-                      ++ "\"OptionalSequence\" =|> "
-                      ++ gDefinitionsList m
-                      ++ gEndOptionSymbol r
+    (Seq (Seq _ l) _) ->
+        ecOptOp ++ cOSSeqSym ++ gDefinitionsList l ++ cCSSeqSym
 
 gRepeatedSequence (Rule "RepeatedSequence" t) = case t of
-    (Seq (Seq l m) r) -> "star "
-                      ++ gStartRepeatSymbol l
-                      ++ "\"RepeatedSequence\" =|> "
-                      ++ gDefinitionsList m
-                      ++ gEndRepeatSymbol r
+    (Seq (Seq _ l) _) ->
+        ecClosureOp ++ cOSSeqSym ++ gDefinitionsList l ++ cCSSeqSym
 
 gGroupedSequence (Rule "GroupedSequence" t) = case t of
-    (Seq (Seq l m) r) -> gStartGroupSymbol l
-                      ++ "\"GroupedSequence\" =|> "
-                      ++ gDefinitionsList m
-                      ++ gEndGroupSymbol r
+    (Seq (Seq _ l) _) ->
+        cOSSeqSym ++ gDefinitionsList l ++ cCSSeqSym
 
 gEmptySequence (Rule "EmptySequence" t) = gTerm t
