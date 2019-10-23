@@ -1,0 +1,109 @@
+letter = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k'
+       | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v'
+       | 'w' | 'x' | 'y' | 'z'
+       | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K'
+       | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V'
+       | 'W' | 'X' | 'Y' | 'Z';
+
+decimalDigit = '0' | '1' | '2' | '3' | '4'
+             | '5' | '6' | '7' | '8' | '9';
+
+concatenateSymbol     = ',';
+definingSymbol        = '=';
+alternativeSymbol     = '|' | '/' | '!';
+endGroupSymbol        = ')';
+endOptionSymbol       = ']' | '/)';
+endRepeatSymbol       = '}' | ':)';
+firstQuoteSymbol      = "'";
+repetitionSymbol      = '*';
+secondQuoteSymbol     = '"';
+exceptSymbol          = '-';
+specialSequenceSymbol = '?';
+startGroupSymbol      = '(';
+startOptionSymbol     = '[' | '(/';
+startRepeatSymbol     = '{' | '(:';
+terminatorSymbol      = ';' | '.';
+
+otherCharacter = spaceCharacter
+               | ':' | '+' | '_' | '%' | '@' | '&' | '#'
+               | '$' | '<' | '>' | '\\' | '^' | "‘" | '~';
+
+spaceCharacter = '\x0020';
+
+horizontalTabulationCharacter = '\t';
+verticalTabulationCharacter   = '\v';
+
+formFeed       = '\f';
+carriageReturn = '\r';
+
+newLine = {carriageReturn}, '\n', {carriageReturn};
+
+terminalString = firstQuoteSymbol, firstTerminalCharacter
+               , {firstTerminalCharacter}, firstQuoteSymbol
+               | secondQuoteSymbol, secondTerminalCharacter
+               , {secondTerminalCharacter}, secondQuoteSymbol;
+
+firstTerminalCharacter = letter
+                       | decimalDigit
+                       | concatenateSymbol
+                       | definingSymbol
+                       | alternativeSymbol
+                       | endGroupSymbol
+                       | endOptionSymbol
+                       | endRepeatSymbol
+                       | exceptSymbol
+                       | repetitionSymbol
+                       | secondQuoteSymbol
+                       | specialSequenceSymbol
+                       | startGroupSymbol
+                       | startOptionSymbol
+                       | startRepeatSymbol
+                       | terminatorSymbol
+                       | otherCharacter;
+
+secondTerminalCharacter = letter
+                        | decimalDigit
+                        | concatenateSymbol
+                        | definingSymbol
+                        | alternativeSymbol
+                        | endGroupSymbol
+                        | endOptionSymbol
+                        | endRepeatSymbol
+                        | exceptSymbol
+                        | firstQuoteSymbol
+                        | repetitionSymbol
+                        | specialSequenceSymbol
+                        | startGroupSymbol
+                        | startOptionSymbol
+                        | startRepeatSymbol
+                        | terminatorSymbol
+                        | otherCharacter;
+
+integer                 = decimalDigit, {decimalDigit};
+metaIdentifier          = letter, {metaIdentifierCharacter};
+metaIdentifierCharacter = letter | decimalDigit;
+
+syntax = syntaxRule, {syntaxRule};
+
+syntaxRule =
+    metaIdentifier, definingSymbol, definitionsList, terminatorSymbol;
+
+definitionsList =
+    singleDefinition, {alternativeSymbol, singleDefinition};
+
+singleDefinition =
+    syntacticFactor, {concatenateSymbol, syntacticFactor};
+
+syntacticFactor = [integer, repetitionSymbol], syntacticPrimary;
+
+syntacticPrimary = optionalSequence
+                 | repeatedSequence
+                 | groupedSequence
+                 | metaIdentifier
+                 | terminalString
+                 | emptySequence;
+
+optionalSequence = startOptionSymbol, definitionsList, endOptionSymbol;
+repeatedSequence = startRepeatSymbol, definitionsList, endRepeatSymbol;
+groupedSequence  = startGroupSymbol, definitionsList, endGroupSymbol;
+emptySequence    = eps;
