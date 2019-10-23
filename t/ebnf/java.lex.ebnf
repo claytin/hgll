@@ -1,0 +1,155 @@
+identifier = javaLetter, {identifierCharacter};
+
+javaLetter = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j'
+           | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't'
+           | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
+           | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J'
+           | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T'
+           | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z'
+           | '_' | '$';
+
+identifierCharacter = javaLetter | digit;
+
+literal = integerLiteral
+        | floatingPointLiteral
+        | booleanLiteral
+        | characterLiteral
+        | stringLiteral
+        | nullLiteral;
+
+
+integerLiteral = decimalIntegerLiteral
+               | hexIntegerLiteral
+               | octalIntegerLiteral
+               | binaryIntegerLiteral;
+
+decimalIntegerLiteral = decimalNumeral, [integerTypeSuffix];
+hexIntegerLiteral     = hexNumeral, [integerTypeSuffix];
+octalIntegerLiteral   = octalNumeral, [integerTypeSuffix];
+binaryIntegerLiteral  = binaryNumeral, [integerTypeSuffix];
+
+integerTypeSuffix = 'l' | 'L';
+
+
+decimalNumeral = '0'
+               | nonZeroDigit, [digits]
+               | nonZeroDigit, '_', {'_'}, digits;
+
+digits = digit, {digitOrUnderscore}, digit
+       | digit;
+
+digit        = '0' | nonZeroDigit;
+nonZeroDigit = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
+
+digitOrUnderscore    = digit | '_';
+
+
+hexNumeral = '0', ('x' | 'X'), hexDigits;
+
+hexDigits  = hexDigit, {hexDigitOrUnderscore}, hexDigit
+           | hexDigit;
+
+hexDigit = digit
+         | 'a' | 'b' | 'c' | 'd' | 'e' | 'f'
+         | 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
+
+hexDigitOrUnderscore    = hexDigit | '_';
+
+
+octalNumeral = '0', {'_'}, octalDigits;
+
+octalDigits  = octalDigit, {octalDigitOrUnderscore}, octalDigit
+             | octalDigit;
+
+octalDigit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7';
+
+octalDigitOrUnderscore    = octalDigit | '_';
+
+
+binaryNumeral = '0', ('b'|'B'), binaryDigits;
+
+binaryDigits  = binaryDigit, {binaryDigitOrUnderscore}, binaryDigit
+              | binaryDigit;
+
+binaryDigit = '0' | '1';
+
+binaryDigitOrUnderscore    = binaryDigit | '_';
+
+
+floatingPointLiteral = decimalFloatingPointLiteral
+                     | hexadecimalFloatingPointLiteral;
+
+decimalFloatingPointLiteral =
+      digits, '.', [digits], [exponentPart], [floatTypeSuffix]
+    | '.', digits, [exponentPart], [floatTypeSuffix]
+    | digits, exponentPart, [floatTypeSuffix]
+    | digits, [exponentPart], floatTypeSuffix;
+
+exponentPart = exponentIndicator, signedInteger;
+
+exponentIndicator = 'e' | 'E';
+
+signedInteger = [sign], digits;
+
+sign = '+' | '-';
+
+floatTypeSuffix = 'f' | 'F' | 'd' | 'D';
+
+
+hexadecimalFloatingPointLiteral =
+    hexSignificand, binaryExponent, [floatTypeSuffix];
+
+hexSignificand = hexNumeral, ['.']
+               | '0', ('x' | 'X'), [hexDigits], '.', hexDigits;
+
+binaryExponent = binaryExponentIndicator, signedInteger;
+
+binaryExponentIndicator = 'p' | 'P';
+
+
+booleanLiteral = 'true' | 'false';
+
+
+characterLiteral = "'", (singleCharacter | escapeSequence), "'";
+singleCharacter  = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j'
+                 | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't'
+                 | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
+                 | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J'
+                 | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T'
+                 | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z'
+                 | digit
+                 | '\x0020'
+                 | '!' | '#' | '$' | '%' | '&' | '(' | ')' | '*' | '+'
+                 | ',' | '-' | '.' | '/' | ':' | ';' | '<' | '=' | '>' | '?'
+                 | '@' | '[' | ']' | '{' | '}' | '|' | '~' | '"'
+                 | '\x007f'
+                 | unicodeEscape;
+
+
+stringLiteral   = '"', {stringCharacter | escapeSequence}, '"';
+stringCharacter = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j'
+                | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't'
+                | 'u' | 'v' | 'w' | 'x' | 'y' | 'z'
+                | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J'
+                | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T'
+                | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z'
+                | digit
+                | '\x0020'
+                | '!' | '#' | '$' | '%' | '&' | "'" | '(' | ')' | '*' | '+'
+                | ',' | '-' | '.' | '/' | ':' | ';' | '<' | '=' | '>' | '?'
+                | '@' | '[' | ']' | '{' | '}' | '|' | '~'
+                | '\x007f'
+                | unicodeEscape;
+
+unicodeEscape = '\\', 'u', {'u'}, 4 * hexDigit;
+
+escapeSequence = '\b' | '\f' | '\n' | '\r' | '\t' | '\\"' | "\\'" | '\\\\'
+               | octalEscape;
+
+octalEscape = '\\', octalDigit, [octalDigit]
+            | '\\', zeroToThree, 2 * octalDigit;
+
+zeroToThree = '0' | '1' | '2' | '3';
+
+
+nullLiteral = 'null';

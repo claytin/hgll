@@ -1,0 +1,373 @@
+qualifiedIdentifier     = identifier, {'.', identifier};
+qualifiedIdentifierList = qualifiedIdentifier, {',', qualifiedIdentifier};
+
+
+compilationUnit = [[anotations], 'package', qualifiedIdentifier, ';']
+                , {importDeclaration}, {typeDeclaration};
+
+importDeclaration = 'import', ['static'], qualifiedIdentifier, ['.*'];
+
+typeDeclaration = classOrInterfaceDeclaration | ';';
+
+classOrInterfaceDeclaration =
+    {modifier}, (classDeclaration | interfaceDeclaration);
+
+classDeclaration = normalClassDeclaration | enumDeclaration;
+
+interfaceDeclaration = normalInterfaceDeclaration | annotationTypeDeclaration;
+
+
+normalClassDeclaration = 'class', identifier, [typeParameters]
+                       , ['extends', ttype], ['implements', typeList]
+                       , classBody;
+
+enumDeclaration = 'enum', identifier, ['implements', typeList], enumBody;
+
+normalInterfaceDeclaration = 'interface', identifier, [typeParameters]
+                           , ['extends', typeList], interfaceBody;
+
+annotationTypeDeclaration = '@', 'interface', identifier, annotationTypeBody;
+
+
+ttype = (basicType | referenceType), {'[', ']'};
+
+basicType = 'byte'
+          | 'short'
+          | 'char'
+          | 'int'
+          | 'long'
+          | 'float'
+          | 'double'
+          | 'boolean';
+
+referenceType =
+    identifier, [typeArguments], {'.', identifier, [typeArguments]};
+
+typeArguments = '<', typeArgument, {',', typeArgument }, '>';
+typeArgument  = referenceType
+              | '?', [('extends' | 'super'), referenceType];
+
+
+nonWildcardTypeArguments = '<', typeList, '>';
+
+typeList = referenceType, {',', referenceType};
+
+typeArgumentsOrDiamond = typeArguments | '<', '>';
+
+nonWildcardTypeArgumentsOrDiamond = nonWildcardTypeArguments | '<', '>';
+
+typeParameters = '<', typeParameter, {',', typeParameter}, '>';
+typeParameter  = identifier, ['extends', bound];
+
+bound = referenceType, {'&', referenceType};
+
+
+modifier = annotation
+         | 'public'
+         | 'protected'
+         | 'private'
+         | 'static'
+         | 'abstract'
+         | 'final'
+         | 'native'
+         | 'synchronized'
+         | 'transient'
+         | 'volatile'
+         | 'strictfp';
+
+annotations = annotation, {annotation};
+annotation  = '@', qualifiedIdentifier, ['(', [annotationElement], ')'];
+
+annotationElement = elementValuePairs | elementValue;
+
+elementValuePairs = elementValuePair, {',', elementValuePair};
+elementValuePair  = identifier, '=', elementValue;
+elementValue      = annotation
+                  | expression1
+                  | elementValueArrayInitializer;
+
+elementValueArrayInitializer = '{', [elementValues], [','], '}';
+
+elementValues = elementValue, {',', elementValue};
+
+
+classBody = '{', {classBodyDeclaration}, '}';
+
+classBodyDeclaration = ['static'], block
+                     | {modifier}, memberDecl
+                     | ';';
+
+memberDecl = methodOrFieldDecl
+           | 'void', identifier, voidMethodDeclaratorRest
+           | identifier, constructorDeclaratorRest
+           | genericMethodOrConstructorDecl
+           | classDeclaration
+           | interfaceDeclaration;
+
+methodOrFieldDecl = ttype, identifier, methodOrFieldRest;
+methodOrFieldRest = fieldDeclaratorsRest, ';'
+                  | methodDeclaratorRest;
+
+fieldDeclaratorsRest = variableDeclaratorRest, {',', variableDeclarator};
+
+methodDeclaratorRest = formalParameters, {'[', ']'}
+                     , ['throws', qualifiedIdentifierList], (block | ';');
+voidMethodDeclaratorRest =
+    formalParameters, ['throws', qualifiedIdentifierList], (block | ';');
+
+constructorDeclaratorRest =
+    formalParameters, ['throws', qualifiedIdentifierList], block;
+
+genericMethodOrConstructorDecl =
+    typeParameters, genericMethodOrConstructorRest;
+genericMethodOrConstructorRest =
+      (ttype | 'void'), identifier, methodDeclaratorRest
+    | identifier, constructorDeclaratorRest;
+
+
+interfaceBody = '{', {interfaceBodyDeclaration}, '}';
+
+interfaceBodyDeclaration = {modifier}, interfaceMemberDecl
+                         | ';';
+
+interfaceMemberDecl = interfaceMethodOrFieldDecl
+                    | 'void', identifier, voidInterfaceMethodDeclaratorRest
+                    | interfaceGenericMethodDecl
+                    | classDeclaration
+                    | interfaceDeclaration;
+
+interfaceMethodOrFieldDecl = ttype, identifier, interfaceMethodOrFieldRest;
+interfaceMethodOrFieldRest = constantDeclaratorsRest, ';'
+                           | interfaceMethodDeclaratorRest;
+
+constantDeclaratorsRest = constantDeclaratorRest, {',', constantDeclarator};
+constantDeclaratorRest  = {'[', ']'}, '=', variableInitializer;
+
+constantDeclarator = identifier, constantDeclaratorRest;
+
+interfaceMethodDeclaratorRest =
+    formalParameters, {'[', ']'}, ['throws', qualifiedIdentifierList];
+
+voidInterfaceMethodDeclaratorRest =
+    formalParameters, ['throws', qualifiedIdentifierList];
+
+interfaceGenericMethodDecl =
+    typeParameters, (ttype | 'void'), identifier, interfaceMethodDeclaratorRest;
+
+
+formalParameters = '(', [formalParameterDecls], ')';
+
+formalParameterDecls = {variableModifier}, ttype, formalParameterDeclsRest;
+
+variableModifier = 'final' | annotation;
+
+formalParameterDeclsRest = variableDeclaratorId, [',', formalParameterDecls]
+                         | '...', variableDeclaratorId;
+
+
+variableDeclaratorId = identifier, {'[', ']'};
+
+
+variableDeclarators = variableDeclarator, {',', variableDeclarator};
+variableDeclarator  = identifier, variableDeclaratorRest;
+
+variableDeclaratorRest = {'[', ']'}, ['=', variableInitializer];
+
+variableInitializer = arrayInitializer | expression;
+
+arrayInitializer =
+    '{', [variableInitializer, {',', variableInitializer}, [',']], '}';
+
+
+block = '{', {blockStatement}, '}';
+
+blockStatement  = localVariableDeclarationStatement
+                | classOrInterfaceDeclaration
+                | [identifier, ':'], statement;
+
+localVariableDeclarationStatement = localVariableDeclaration, ';';
+
+localVariableDeclaration = {variableModifier}, ttype, variableDeclarators;
+
+statement = block
+          | ';'
+          | identifier, ':', statement
+          | statementExpression, ';'
+          | 'if', parExpression, statement, ['else', statement]
+          | 'assert', expression, [':', expression], ';'
+          | 'switch', parExpression, '{', switchBlockStatementGroups, '}'
+          | 'while', parExpression, statement
+          | 'do', statement, 'while', parExpression, ';'
+          | for, '(', forControl, ')', statement
+          | 'break', [identifier], ';'
+          | 'continue', [identifier], ';'
+          | 'return', [expression], ';'
+          | 'throw', expression, ';'
+          | 'synchronized', parExpression, block
+          | 'try', block, (catches | [catches], finally)
+          | 'try', resourceSpecification, block, [catches], [finally];
+
+statementExpression = expression;
+
+
+catches = catchClause, {catchClause};
+
+catchClause =
+    'catch', '(', {variableModifier}, catchType, identifier, ')', block;
+
+catchType = qualifiedIdentifier, {'|', qualifiedIdentifier};
+
+finally = 'finally', block;
+
+resourceSpecification = '(', resources, [';'], ')';
+
+resources = resource, {';', resource};
+resource  =
+    {variableModifier}, referenceType, variableDeclaratorId, '=', expression;
+
+
+switchBlockStatementGroups = {switchBlockStatementGroup};
+switchBlockStatementGroup  = switchLabels, blockStatements;
+
+switchLabels = switchLabel, {switchLabel};
+switchLabel  = 'case', (expression | enumConstantName), ':'
+             | 'default', ':';
+
+enumConstantName = identifier;
+
+
+forControl = forVarControl
+           | forInit, ';', [expression], ';', [forUpdate];
+
+forVarControl =
+    {variableModifier}, ttype, variableDeclaratorId, forVarControlRest;
+
+forVarControlRest =
+      forVariableDeclaratorsRest, ';', [expression], ';', [forUpdate]
+    | ':', expression;
+
+forVariableDeclaratorsRest =
+    ['=', variableInitializer], {',', variableDeclarator};
+
+forInit   = forUpdate;
+forUpdate = statementExpressions;
+
+statementExpressions = statementExpression, {',', statementExpression};
+
+
+expression = expression1, [assignmentOperator, expression1];
+
+assignmentOperator = '='
+                   | '+=' | '-=' | '*=' | '\='
+                   | '&=' | '|='
+                   | '^=' | '%='
+                   | '<<=' | '>>=' | '>>>=';
+
+expression1 = expression2, [expression1Rest];
+
+expression1Rest = '?', expression, ':', expression1;
+
+expression2 = expression3, [expression2Rest];
+
+expression2Rest = {infixOp, expression3}
+                | 'instanceof', ttype;
+
+
+infixOp = '||' | '&&' | '|' | '&'
+        | '==' | '!='
+        | '<' | '>' | '<=' | '>='
+        | '<<' | '>>' | '>>>'
+        | '+' | '-' | '*' | '/' | '%' | '^';
+
+expression3 = prefixOp, expression3
+            | '(', (expression | ttype), ')', expression3
+            | primary, {selector}, {postfixOp};
+
+prefixOp = '++' | '--'
+         | '!' | '~'
+         | '+' | '-';
+
+postfixOp = '++' | '--';
+
+
+primary = literal
+        | parExpression
+        | 'this', [arguments]
+        | 'super', superSiffix
+        | 'new', creator
+        | nonWildcardTypeArguments
+        , (explicitGenericInvocationSuffix | 'this', arguments)
+        | qualifiedIdentifier, [identifierSuffix]
+        | basicType, {'[', ']'}, '.', 'class'
+        | 'void', '.', 'class';
+
+
+parExpression = '(', expression, ')';
+
+arguments = '(', [expression, {',', expression}], ')';
+
+superSiffix = arguments
+            | '.', identifier, [arguments];
+
+explicitGenericInvocationSuffix = 'super', superSiffix
+                                | identifier, arguments;
+
+
+creator = nonWildcardTypeArguments, createdName, classCreatorRest
+        | createdName, (classCreatorRest | arrayCreatorRest);
+
+createdName = identifier, [typeArgumentsOrDiamond]
+            , {'.', identifier, [typeArgumentsOrDiamond]};
+
+classCreatorRest = arguments, [classBody];
+
+arrayCreatorRest =
+    '[', ( ']', {'[', ']'}, arrayInitializer
+         | expression, ']', {'[', expression, ']'}, {'[', ']'} );
+
+
+identifierSuffix = '[', ({'[', ']'}, '.', 'class' | expression), ']'
+                 | arguments
+                 | '.', ( 'class'
+                        | explicitGenericInvocation
+                        | 'this'
+                        | 'super', arguments
+                        | 'new', [nonWildcardTypeArguments], innerCreator )
+                 ;
+
+explicitGenericInvocation =
+    nonWildcardTypeArguments, explicitGenericInvocationSuffix;
+
+innerCreator =
+    identifier, [nonWildcardTypeArgumentsOrDiamond], classCreatorRest;
+
+
+selector = '.', ( identifier
+                | explicitGenericInvocation
+                | 'this'
+                | 'super', superSiffix
+                | 'new', [nonWildcardTypeArguments], innerCreator )
+         | '[', expression, ']';
+
+
+enumBody = '{', [enumConstants], [','], [enumBodyDeclarations], '}';
+
+enumConstants = enumConstant, {',', enumConstant};
+enumConstant  = [annotations], identifier, [arguments], [classBody];
+
+enumBodyDeclarations = ';', {classBodyDeclaration};
+
+annotationTypeBody = '{', {annotationTypeElementDeclaration}, '}';
+
+annotationTypeElementDeclaration = {modifier}, annotationTypeElementRest;
+
+annotationTypeElementRest = ttype, identifier, annotationMethodOrConstantRest
+                          | classDeclaration
+                          | interfaceDeclaration
+                          | enumDeclaration
+                          | annotationTypeDeclaration;
+
+annotationMethodOrConstantRest = annotationMethodRest
+                               | constantDeclaratorsRest;
+
+annotationMethodRest = '(', ')', ['[', ']'], ['default', elementValue];
