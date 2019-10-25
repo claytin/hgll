@@ -24,8 +24,8 @@ instance Monad Std where
         concat [ q i' | (i', a) <- p i , let Std q = f a ]
 
 instance GrammO Std where
-    -- (<,>) :: Std a -> Std b -> Std (a, b)
-    p <,> q = do a <- p
+    -- (<:>) :: Std a -> Std b -> Std (a, b)
+    p <:> q = do a <- p
                  b <- q
                  return (a, b)
     -- (<|>) :: Std a -> Std a -> Std a
