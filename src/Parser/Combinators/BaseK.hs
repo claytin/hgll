@@ -46,7 +46,7 @@ term s  = KP $ \k -> Std (term' k)
 -- The sequence combinator is a function that takes two parsers and apply both
 -- of them, in order, from the left, to the given input
 sqnc     :: StdK ParseTree -> StdK ParseTree -> StdK ParseTree
-sqnc p q = p <:> q >>= \(x, y) -> return $ Seq x y
+sqnc p q = p <,> q >>= \(x, y) -> return $ Seq x y
 
 -- The rule function is more of a wrapper function. It takes a label, which
 -- will identify a set of alternatives alts. Even though alts is a single
