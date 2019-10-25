@@ -29,16 +29,14 @@ import Parser.Combinators.ExtK
 -- to parsing errors
 
 letter = "Letter" =!>
-          t "a" <|> t "b" <|> t "c" <|> t "d" <|> t "e" <|> t "f"
-      <|> t "g" <|> t "h" <|> t "i" <|> t "j" <|> t "k" <|> t "l"
-      <|> t "m" <|> t "n" <|> t "o" <|> t "p" <|> t "q" <|> t "r"
-      <|> t "s" <|> t "t" <|> t "u" <|> t "v" <|> t "w" <|> t "x"
-      <|> t "y" <|> t "z"
-      <|> t "A" <|> t "B" <|> t "C" <|> t "D" <|> t "E" <|> t "F"
-      <|> t "G" <|> t "H" <|> t "I" <|> t "J" <|> t "K" <|> t "L"
-      <|> t "M" <|> t "N" <|> t "O" <|> t "P" <|> t "Q" <|> t "R"
-      <|> t "S" <|> t "T" <|> t "U" <|> t "V" <|> t "W" <|> t "X"
-      <|> t "Y" <|> t "Z"
+          t "a" <|> t "b" <|> t "c" <|> t "d" <|> t "e" <|> t "f" <|> t "g"
+      <|> t "h" <|> t "i" <|> t "j" <|> t "k" <|> t "l" <|> t "m" <|> t "n"
+      <|> t "o" <|> t "p" <|> t "q" <|> t "r" <|> t "s" <|> t "t" <|> t "u"
+      <|> t "v" <|> t "w" <|> t "x" <|> t "y" <|> t "z"
+      <|> t "A" <|> t "B" <|> t "C" <|> t "D" <|> t "E" <|> t "F" <|> t "G"
+      <|> t "H" <|> t "I" <|> t "J" <|> t "K" <|> t "L" <|> t "M" <|> t "N"
+      <|> t "O" <|> t "P" <|> t "Q" <|> t "R" <|> t "S" <|> t "T" <|> t "U"
+      <|> t "V" <|> t "W" <|> t "X" <|> t "Y" <|> t "Z"
 
 decimalDigit = "DecimalDigit" =!>
                 t "0" <|> t "1" <|> t "2" <|> t "3" <|> t "4"
@@ -58,8 +56,7 @@ startGroupSymbol      = "StartGroupSymbol"      =!> t "("
 startOptionSymbol     = "StartOptionSymbol"     =!> t "[" <|> t "(/"
 startRepeatSymbol     = "StartRepeatSymbol"     =!> t "{" <|> t "(:"
 terminatorSymbol      = "TerminatorSymbol"      =!> t ";" <|> t "."
-alternativeSymbol     = "AlternativeSymbol"     =!>
-    t "|" <|> t "/" <|> t "!"
+alternativeSymbol     = "AlternativeSymbol"     =!> t "|" <|> t "/" <|> t "!"
 
 otherCharacter = "OtherCharacter" =!>
                   spaceCharacter
@@ -71,13 +68,10 @@ otherCharacter = "OtherCharacter" =!>
 -- gaps are not used by the EBNF meta syntax, and are trimmed from the input
 spaceCharacter = "SpaceCharacter" =!> t " "
 
-newLine = "NewLine" =!>
-    star carriageReturn # t "\n" # star carriageReturn
+newLine = "NewLine" =!> star carriageReturn # t "\n" # star carriageReturn
 
-horizontalTabulationCharacter = "HorizontalTabulationCharacter" =!>
-    t "\t"
-verticalTabulationCharacter   = "VerticalTabulationCharacter"   =!>
-    t "\v"
+horizontalTabulationCharacter = "HorizontalTabulationCharacter" =!> t "\t"
+verticalTabulationCharacter   = "VerticalTabulationCharacter"   =!> t "\v"
 
 formFeed       = "FormFeed"       =!> t "\f"
 carriageReturn = "CarriageReturn" =!> t "\r"
