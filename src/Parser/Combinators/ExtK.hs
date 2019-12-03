@@ -39,7 +39,6 @@ closure p = "Closure" =!> p' <|> eps
 -- pattern described by p
 times     :: Int -> StdK ParseTree -> StdK ParseTree
 times 0 _ = eps
-times 1 p = p
 times n p = "Repetition" =!> p'
     where
         p' = p # (n - 1) *. p
