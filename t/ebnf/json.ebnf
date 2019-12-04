@@ -26,8 +26,7 @@ element = ws, value, ws;
 
 string = '"', characters, '"';
 
-characters = character, characters
-           | eps;
+characters = character, characters | ;
 
 character = 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k'
           | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v'
@@ -64,16 +63,16 @@ digit = '0' | onenine;
 
 onenine = '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
 
-fraction = '.', digits | eps;
+fraction = '.', digits | ;
 
 exponent = 'e', sign, digits
          | 'E', sign, digits
-         | eps;
+         | ;
 
-sign = '+' | '-' | eps;
+sign = '+' | '-' | ;
 
 ws = '\x0020', ws
    | '\n', ws
    | '\r', ws
    | '\t', ws
-   | eps;
+   | ;
