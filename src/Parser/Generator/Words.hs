@@ -8,16 +8,16 @@ import Parser.Generator.Util
 import Parser.Generator.CharSet
 
 gTerminalString (Rule "TerminalString" t) = case t of
-    (Seq (Seq (Seq (Rule "FirstQuoteSymbol" _) b) c) _) ->
-        cTermOp ++ cQuoteSym
-                ++ gFirstTerminalCharacter b
-                ++ gStar gFirstTerminalCharacter c
-                ++ cQuoteSym
-    (Seq (Seq (Seq (Rule "SecondQuoteSymbol" _) b) c) _) ->
-        cTermOp ++ cQuoteSym
-                ++ gSecondTerminalCharacter b
-                ++ gStar gSecondTerminalCharacter c
-                ++ cQuoteSym
+    (Seq (Seq (Seq a@(Rule "FirstQuoteSymbol" _) b) c) d) ->
+        gTermC ++ gFirstQuoteS a
+               ++ gFirstTerminalCharacter b
+               ++ gClosure gFirstTerminalCharacter c
+               ++ gFirstQuoteS d
+    (Seq (Seq (Seq a@(Rule "SecondQuoteSymbol" _) b) c) d) ->
+        gTermC ++ gSecondQuoteS a
+               ++ gSecondTerminalCharacter b
+               ++ gClosure gSecondTerminalCharacter c
+               ++ gSecondQuoteS d
 
 gFirstTerminalCharacter (Rule "FirstTerminalCharacter" t) = case t of
     (Rule "Letter" _)                -> gLetter t
@@ -58,11 +58,11 @@ gSecondTerminalCharacter (Rule "SecondTerminalCharacter" t) = case t of
     (Rule "OtherCharacter" _)        -> gOtherCharacter t
 
 gMetaIdentifier (Rule "MetaIdentifier" t) = case t of
-    (Seq l r) -> gLetter l ++ gStar gMetaIdentifierCharacter r
+    (Seq l r) -> gLetter l ++ gClosure gMetaIdentifierCharacter r
 
 gMetaIdentifierCharacter (Rule "MetaIdentifierCharacter" t) = case t of
     (Rule "Letter" _) -> gLetter t
     _                 -> gDecimalDigit t
 
 gInteger (Rule "Integer" t) = case t of
-    (Seq l r) -> gDecimalDigit l ++ gStar gDecimalDigit r
+    (Seq l r) -> gDecimalDigit l ++ gClosure gDecimalDigit r

@@ -1,40 +1,37 @@
 -- TODO
--- 1. Add spaces for readability, it may also help Haskell not to get confused
--- 2. Can some identation be implemented?
+-- 1. Can some identation be implemented?
 module Parser.Generator.Syntax ( gSyntax ) where
 
 import Parser.Data.ParseTree
-import Parser.Generator.Util
 
+import Parser.Generator.Util
 import Parser.Generator.Words
 import Parser.Generator.CharSet
 
 
 gSyntax (Rule "Syntax" t) = case t of
-    (Seq l r) -> gSyntaxRule l ++ gStar gSyntaxRule r
+    (Seq l r) -> gSyntaxRule l ++ gClosure gSyntaxRule r
 
 gSyntaxRule (Rule "SyntaxRule" t) = case t of
-    (Seq (Seq (Seq l m) n) _) -> gMetaIdentifier l
-                              ++ " " ++ gDefiningSymbol m
-                              ++ " \"" ++ gMetaIdentifier l ++ "\""
-                              ++ cRuleDefOp
-                              ++ gDefinitionsList n
-                              ++ cRuleTermSym
+    (Seq (Seq (Seq a b) c) d) ->
+        gMetaIdentifier a ++ gSepS    ++ gDefiningSymbol b  ++ gSepS
+                          ++ gQuoteS  ++ gMetaIdentifier a  ++ gQuoteS
+                          ++ gRuleC b ++ gDefinitionsList c ++ gTerminatorS d
 
 gDefinitionsList (Rule "DefinitionsList" t) = case t of
-    (Seq l r) -> gSingleDefinition l ++ gStar list r
+    (Seq l r) -> gSingleDefinition l ++ gClosure list r
         where
-            list (Seq _ d) = cAltOp ++ gSingleDefinition d
+            list (Seq c d) = gAltC c ++ gSingleDefinition d
 
 gSingleDefinition (Rule "SingleDefinition" t) = case t of
-    (Seq l r) -> gSyntacticFactor l ++ gStar def r
+    (Seq l r) -> gSyntacticFactor l ++ gClosure def r
         where
-            def (Seq _ f) = cSeqOp ++ gSyntacticFactor f
+            def (Seq c f) = gSqncC c ++ gSyntacticFactor f
 
 gSyntacticFactor (Rule "SyntacticFactor" t) = case t of
-    (Seq l r) -> gOpt nTimes l ++ gSyntacticPrimary r
+    (Seq l r) -> gOptional nTimes l ++ gSyntacticPrimary r
         where
-            nTimes (Seq n _) = gInteger n ++ ecRepOp
+            nTimes (Seq n c) = gInteger n ++ gRepC c
 
 gSyntacticPrimary (Rule "SyntacticPrimary" t) = case t of
      (Rule "OptionalSequence" _) -> gOptionalSequence t
@@ -46,14 +43,14 @@ gSyntacticPrimary (Rule "SyntacticPrimary" t) = case t of
 
 gOptionalSequence (Rule "OptionalSequence" t) = case t of
     (Seq (Seq _ l) _) ->
-        ecOptOp ++ cOSSeqSym ++ gDefinitionsList l ++ cCSSeqSym
+        gOptC ++ gOpenParnS ++ gDefinitionsList l ++ gCloseParnS
 
 gRepeatedSequence (Rule "RepeatedSequence" t) = case t of
     (Seq (Seq _ l) _) ->
-        ecClosureOp ++ cOSSeqSym ++ gDefinitionsList l ++ cCSSeqSym
+        gClosureC ++ gOpenParnS ++ gDefinitionsList l ++ gCloseParnS
 
 gGroupedSequence (Rule "GroupedSequence" t) = case t of
     (Seq (Seq _ l) _) ->
-        cOSSeqSym ++ gDefinitionsList l ++ cCSSeqSym
+        gOpenParnS ++ gDefinitionsList l ++ gCloseParnS
 
-gEmptySequence (Rule "EmptySequence" t) = gTerm t
+gEmptySequence (Rule "EmptySequence" t) = gEpsC

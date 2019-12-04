@@ -19,7 +19,7 @@ module Parser.Generator.CharSet ( gLetter
 
 import Parser.Data.ParseTree
 
-import Parser.Generator.Util (gTerm, gStar)
+import Parser.Generator.Util (gTerm, gClosure, gEscQuoteS)
 
 gLetter (Rule "Letter" t) = gTerm t
 
@@ -33,7 +33,7 @@ gEndOptionSymbol       (Rule "EndOptionSymbol" t)       = gTerm t
 gEndRepeatSymbol       (Rule "EndRepeatSymbol" t)       = gTerm t
 gFirstQuoteSymbol      (Rule "FirstQuoteSymbol" t)      = gTerm t
 gRepetitionSymbol      (Rule "RepetitionSymbol" t)      = gTerm t
-gSecondQuoteSymbol     (Rule "SecondQuoteSymbol" t)     = "\\\""
+gSecondQuoteSymbol     (Rule "SecondQuoteSymbol" _)     = gEscQuoteS
 gExceptSymbol          (Rule "ExceptSymbol" t)          = gTerm t
 gSpecialSequenceSymbol (Rule "SpecialSequenceSymbol" t) = gTerm t
 gStartGroupSymbol      (Rule "StartGroupSymbol" t)      = gTerm t
@@ -48,9 +48,9 @@ gOtherCharacter (Rule "OtherCharacter" t) = case t of
 gSpaceCharacter (Rule "SpaceCharacter" t) = gTerm t
 
 gNewLine (Rule "NewLine" t) = case t of
-    (Seq (Seq l m) r) -> gStar gCarriageReturn l
+    (Seq (Seq l m) r) -> gClosure gCarriageReturn l
                       ++ gTerm m
-                      ++ gStar gCarriageReturn r
+                      ++ gClosure gCarriageReturn r
 
 gCarriageReturn (Rule "CarriageReturn" t) = gTerm t
 
