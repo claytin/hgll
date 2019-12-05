@@ -62,7 +62,8 @@ otherCharacter = "OtherCharacter" =!>
                   spaceCharacter
               <|> t ":" <|> t "+" <|> t "_" <|> t "%" <|> t "@"
               <|> t "&" <|> t "#" <|> t "$" <|> t "<" <|> t ">"
-              <|> t "\\" <|> t "^" <|> t "‘" <|> t "~"
+              <|> t "^" <|> t "‘" <|> t "~"
+              <|> t "\\"
 
 -- The parsers bellow are not exported, at least for now. The reason being that
 -- gaps are not used by the EBNF meta syntax, and are trimmed from the input
