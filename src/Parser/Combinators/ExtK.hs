@@ -1,5 +1,6 @@
 module Parser.Combinators.ExtK ( module Parser.Combinators.BaseK
                                , rule', (=!>)
+                               , except, (-.)
                                , opt
                                , closure, star
                                , times, (*.) ) where
