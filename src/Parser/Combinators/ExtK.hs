@@ -22,6 +22,15 @@ rule' l alts = KP $ \k -> Std (rule'' k)
             [ ]         -> [ ]
             ((i', a):_) -> let Std p = k a in p i'
 
+-- Only tries to apply p if q fails. If p succeeds it also succeeds, it fails
+-- otherwise
+except          :: StdK ParseTree -> StdK ParseTree -> StdK ParseTree
+except (KP p) q = KP $ \k -> Std (except' k)
+    where
+        except' k i = case parse q i of
+            [ ] -> parse (p k) i
+            _   -> [ ]
+
 -- A parser that always succeeds, either by the success of its parameter p, or
 -- by the empty production. This represents a sequence of at most one match of
 -- the pattern described by p
@@ -46,8 +55,11 @@ times n p = "Repetition" =!> p'
 -- Aliases --
 star = closure
 
+infixl 2 -.
+(-.) = except
+
 -- The highest precedence on the set of EBNF operators
-infixl 4 *.
+infixl 5 *.
 (*.) = times
 
 -- See the rule combinator fixity definition in Parser.Combinators.Base

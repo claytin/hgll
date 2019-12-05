@@ -1,5 +1,6 @@
 module Parser.Combinators.Ext ( module Parser.Combinators.Base
                               , rule', (=!>)
+                              , except, (-.)
                               , opt
                               , closure, star
                               , times, (*.) ) where
@@ -19,6 +20,14 @@ rule' l alts = Std $ \i ->
     case parse (rule l alts) i of
         [ ]    -> [ ]
         (x:xs) -> [x]
+
+-- Only tries to apply p if q fails. If p succeeds it also succeeds, it fails
+-- otherwise
+except     :: Std ParseTree -> Std ParseTree -> Std ParseTree
+except p q = Std $ \i ->
+    case parse q i of
+        [ ] -> parse p i 
+        _   -> [ ]
 
 -- A parser that always succeeds, either by the success of its parameter p, or
 -- by the empty production. This represents a sequence of at most one match of
@@ -44,8 +53,11 @@ times n p = "Repetition" =!> p'
 -- Aliases --
 star = closure
 
+infixl 2 -.
+(-.) = except
+
 -- The highest precedence on the set of EBNF operators
-infixl 4 *.
+infixl 5 *.
 (*.) = times
 
 -- See the rule combinator fixity definition in Parser.Combinators.Base
