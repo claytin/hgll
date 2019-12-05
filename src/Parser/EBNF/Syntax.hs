@@ -29,9 +29,9 @@ syntacticPrimary = "SyntacticPrimary" =!>
                     optionalSequence
                 <|> repeatedSequence
                 <|> groupedSequence
-                <|> emptySequence
                 <|> metaIdentifier
                 <|> terminalString
+                <|> emptySequence
 
 optionalSequence = "OptionalSequence" =!>
     startOptionSymbol # definitionsList # endOptionSymbol
@@ -44,4 +44,5 @@ groupedSequence = "GroupedSequence" =!>
 
 -- This does not correspond to the ISO EBNF standard, but it is necessary
 -- because it is "not possible" to distinguish an empty production otherwise
-emptySequence = "EmptySequence" =!> t "eps"
+-- emptySequence = "EmptySequence" =!> t "eps"
+emptySequence = "EmptySequence" =!> eps
