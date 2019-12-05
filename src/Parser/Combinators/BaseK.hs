@@ -70,7 +70,7 @@ t = term
 
 -- If (#) is applied to a sequence of, say, elements a, b, and c, a # b # c
 -- is equivalent to (a # b) # c
-infixl 3 #
+infixl 4 #
 (#) = sqnc
 
 -- This fixity definition of rule is as follows so that it will be the last
