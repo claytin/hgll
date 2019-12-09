@@ -26,7 +26,8 @@ terminatorSymbol      = ';' | '.';
 
 otherCharacter = spaceCharacter
                | ':' | '+' | '_' | '%' | '@' | '&' | '#'
-               | '$' | '<' | '>' | '\\' | '^' | "‘" | '~';
+               | '$' | '<' | '>' | '^' | '`' | '~'
+               | '\\';
 
 spaceCharacter = '\x0020';
 
@@ -38,46 +39,34 @@ carriageReturn = '\r';
 
 newLine = {carriageReturn}, '\n', {carriageReturn};
 
+terminalCharacter = letter
+                  | decimalDigit
+                  | concatenateSymbol
+                  | definingSymbol
+                  | alternativeSymbol
+                  | endCommentSymbol
+                  | endGroupSymbol
+                  | endOptionSymbol
+                  | endRepeatSymbol
+                  | exceptSymbol
+                  | firstQuoteSymbol
+                  | repetitionSymbol
+                  | secondQuoteSymbol
+                  | specialSequenceSymbol
+                  | startCommentSymbol
+                  | startGroupSymbol
+                  | startOptionSymbol
+                  | startRepeatSymbol
+                  | terminatorSymbol
+                  | otherCharacter;
+
 terminalString = firstQuoteSymbol, firstTerminalCharacter
                , {firstTerminalCharacter}, firstQuoteSymbol
                | secondQuoteSymbol, secondTerminalCharacter
                , {secondTerminalCharacter}, secondQuoteSymbol;
 
-firstTerminalCharacter = letter
-                       | decimalDigit
-                       | concatenateSymbol
-                       | definingSymbol
-                       | alternativeSymbol
-                       | endGroupSymbol
-                       | endOptionSymbol
-                       | endRepeatSymbol
-                       | exceptSymbol
-                       | repetitionSymbol
-                       | secondQuoteSymbol
-                       | specialSequenceSymbol
-                       | startGroupSymbol
-                       | startOptionSymbol
-                       | startRepeatSymbol
-                       | terminatorSymbol
-                       | otherCharacter;
-
-secondTerminalCharacter = letter
-                        | decimalDigit
-                        | concatenateSymbol
-                        | definingSymbol
-                        | alternativeSymbol
-                        | endGroupSymbol
-                        | endOptionSymbol
-                        | endRepeatSymbol
-                        | exceptSymbol
-                        | firstQuoteSymbol
-                        | repetitionSymbol
-                        | specialSequenceSymbol
-                        | startGroupSymbol
-                        | startOptionSymbol
-                        | startRepeatSymbol
-                        | terminatorSymbol
-                        | otherCharacter;
+firstTerminalCharacter  = terminalCharacter - firstQuoteSymbol;
+secondTerminalCharacter = terminalCharacter - secondQuoteSymbol;
 
 integer                 = decimalDigit, {decimalDigit};
 metaIdentifier          = letter, {metaIdentifierCharacter};
@@ -106,4 +95,4 @@ syntacticPrimary = optionalSequence
 optionalSequence = startOptionSymbol, definitionsList, endOptionSymbol;
 repeatedSequence = startRepeatSymbol, definitionsList, endRepeatSymbol;
 groupedSequence  = startGroupSymbol, definitionsList, endGroupSymbol;
-emptySequence    = eps;
+emptySequence    = ;
