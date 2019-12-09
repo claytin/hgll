@@ -1,32 +1,29 @@
+-- This module defines the ISO/IEC 646:1991 (according to the ISO/IEC 14977
+-- EBNF standard) 7 bit character set.
+--
 module Parser.EBNF.CharSet ( letter
                            , decimalDigit
                            , concatenateSymbol
-                           , alternativeSymbol
                            , definingSymbol
-                           , startGroupSymbol
-                           , startOptionSymbol
-                           , startRepeatSymbol
+                           , alternativeSymbol
+                           , endCommentSymbol
                            , endGroupSymbol
                            , endOptionSymbol
                            , endRepeatSymbol
-                           , firstQuoteSymbol
-                           , secondQuoteSymbol
                            , exceptSymbol
-                           , specialSequenceSymbol
+                           , firstQuoteSymbol
                            , repetitionSymbol
+                           , secondQuoteSymbol
+                           , specialSequenceSymbol
+                           , startCommentSymbol
+                           , startGroupSymbol
+                           , startOptionSymbol
+                           , startRepeatSymbol
                            , terminatorSymbol
                            , otherCharacter ) where
 
 import Parser.Instance.K
 import Parser.Combinators.ExtK
-
--- This module defines the ISO/IEC 646:1991 (according to the ISO/IEC 14977
--- EBNF standard) 7 bit character set.
---
--- Note: this module does not define parsers for the special sequence symbol,
--- except symbol, start/end comment symbol. This rules are not supported or in
--- any other way treated by this implementation, trying and use them will lead
--- to parsing errors
 
 letter = "Letter" =!>
           t "a" <|> t "b" <|> t "c" <|> t "d" <|> t "e" <|> t "f" <|> t "g"
@@ -44,6 +41,8 @@ decimalDigit = "DecimalDigit" =!>
 
 concatenateSymbol     = "ConcatenateSymbol"     =!> t ","
 definingSymbol        = "DefiningSymbol"        =!> t "="
+alternativeSymbol     = "AlternativeSymbol"     =!> t "|" <|> t "/" <|> t "!"
+endCommentSymbol      = "EndCommentSymbol"      =!> t "*)"
 endGroupSymbol        = "EndGroupSymbol"        =!> t ")"
 endOptionSymbol       = "EndOptionSymbol"       =!> t "]" <|> t "/)"
 endRepeatSymbol       = "EndRepeatSymbol"       =!> t "}" <|> t ":)"
@@ -52,20 +51,20 @@ firstQuoteSymbol      = "FirstQuoteSymbol"      =!> t "'"
 repetitionSymbol      = "RepetitionSymbol"      =!> t "*"
 secondQuoteSymbol     = "SecondQuoteSymbol"     =!> t "\""
 specialSequenceSymbol = "SpecialSequenceSymbol" =!> t "?"
+startCommentSymbol    = "StartCommentSymbol"    =!> t "(*"
 startGroupSymbol      = "StartGroupSymbol"      =!> t "("
 startOptionSymbol     = "StartOptionSymbol"     =!> t "[" <|> t "(/"
 startRepeatSymbol     = "StartRepeatSymbol"     =!> t "{" <|> t "(:"
 terminatorSymbol      = "TerminatorSymbol"      =!> t ";" <|> t "."
-alternativeSymbol     = "AlternativeSymbol"     =!> t "|" <|> t "/" <|> t "!"
 
 otherCharacter = "OtherCharacter" =!>
                   spaceCharacter
               <|> t ":" <|> t "+" <|> t "_" <|> t "%" <|> t "@"
               <|> t "&" <|> t "#" <|> t "$" <|> t "<" <|> t ">"
-              <|> t "^" <|> t "‘" <|> t "~"
+              <|> t "^" <|> t "`" <|> t "~"
               <|> t "\\"
 
--- The parsers bellow are not exported, at least for now. The reason being that
+-- The parsers bellow are not exported, at least for now. The reason being,
 -- gaps are not used by the EBNF meta syntax, and are trimmed from the input
 spaceCharacter = "SpaceCharacter" =!> t " "
 
