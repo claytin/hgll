@@ -1,13 +1,35 @@
 -- Only the rules needed by the EBNF meta sytnax (Parser.EBNF.Syntax) are
 -- exported
 module Parser.EBNF.Words ( terminalString
-                         , metaIdentifier
-                         , integer ) where
+                         , integer
+                         , metaIdentifier ) where
 
 import Parser.Instance.K
 import Parser.Combinators.ExtK
 
 import Parser.EBNF.CharSet
+
+terminalCharacter = "TerminalCharacter" =!>
+                     letter
+                 <|> decimalDigit
+                 <|> concatenateSymbol
+                 <|> definingSymbol
+                 <|> alternativeSymbol     -- definition separator symbol
+                 <|> endCommentSymbol
+                 <|> endGroupSymbol
+                 <|> endOptionSymbol
+                 <|> endRepeatSymbol
+                 <|> exceptSymbol
+                 <|> firstQuoteSymbol
+                 <|> repetitionSymbol
+                 <|> secondQuoteSymbol
+                 <|> specialSequenceSymbol
+                 <|> startCommentSymbol
+                 <|> startGroupSymbol
+                 <|> startOptionSymbol
+                 <|> startRepeatSymbol
+                 <|> terminatorSymbol
+                 <|> otherCharacter
 
 terminalString = "TerminalString" =!>
                   firstQuoteSymbol # firstTerminalCharacter
@@ -18,47 +40,15 @@ terminalString = "TerminalString" =!>
                                     # secondQuoteSymbol
 
 firstTerminalCharacter = "FirstTerminalCharacter" =!>
-                          letter
-                      <|> decimalDigit
-                      <|> concatenateSymbol
-                      <|> definingSymbol
-                      <|> alternativeSymbol
-                      <|> endGroupSymbol
-                      <|> endOptionSymbol
-                      <|> endRepeatSymbol
-                      <|> exceptSymbol
-                      <|> repetitionSymbol
-                      <|> secondQuoteSymbol
-                      <|> specialSequenceSymbol
-                      <|> startGroupSymbol
-                      <|> startOptionSymbol
-                      <|> startRepeatSymbol
-                      <|> terminatorSymbol
-                      <|> otherCharacter
+    terminalCharacter -. firstQuoteSymbol
 
 secondTerminalCharacter = "SecondTerminalCharacter" =!>
-                           letter
-                       <|> decimalDigit
-                       <|> concatenateSymbol
-                       <|> definingSymbol
-                       <|> alternativeSymbol
-                       <|> endGroupSymbol
-                       <|> endOptionSymbol
-                       <|> endRepeatSymbol
-                       <|> exceptSymbol
-                       <|> firstQuoteSymbol
-                       <|> repetitionSymbol
-                       <|> specialSequenceSymbol
-                       <|> startGroupSymbol
-                       <|> startOptionSymbol
-                       <|> startRepeatSymbol
-                       <|> terminatorSymbol
-                       <|> otherCharacter
+    terminalCharacter -. secondQuoteSymbol
+
+integer = "Integer" =!> decimalDigit # star decimalDigit
 
 metaIdentifier = "MetaIdentifier" =!> letter # star metaIdentifierCharacter
 
 metaIdentifierCharacter = "MetaIdentifierCharacter" =!>
                            letter
                        <|> decimalDigit
-
-integer = "Integer" =!> decimalDigit # star decimalDigit
