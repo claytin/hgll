@@ -24,9 +24,14 @@ gDefinitionsList (Rule "DefinitionsList" t) = case t of
             list (Seq c d) = gAltC c ++ gSingleDefinition d
 
 gSingleDefinition (Rule "SingleDefinition" t) = case t of
-    (Seq l r) -> gSyntacticFactor l ++ gClosure def r
+    (Seq l r) -> gSyntacticTerm l ++ gClosure def r
         where
-            def (Seq c f) = gSqncC c ++ gSyntacticFactor f
+            def (Seq c t') = gSqncC c ++ gSyntacticTerm t'
+
+gSyntacticTerm (Rule "SyntacticTerm" t) = case t of
+    (Seq l r) -> gSyntacticFactor l ++ gOptional except r
+        where
+            except (Seq c f) = gExceptC c ++ gSyntacticFactor f
 
 gSyntacticFactor (Rule "SyntacticFactor" t) = case t of
     (Seq l r) -> gOptional nTimes l ++ gSyntacticPrimary r

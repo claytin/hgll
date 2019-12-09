@@ -3,17 +3,19 @@ module Parser.Generator.CharSet ( gLetter
                                 , gConcatenateSymbol
                                 , gDefiningSymbol
                                 , gAlternativeSymbol
-                                , gStartGroupSymbol
-                                , gStartOptionSymbol
-                                , gStartRepeatSymbol
+                                , gEndCommentSymbol
                                 , gEndGroupSymbol
                                 , gEndOptionSymbol
                                 , gEndRepeatSymbol
                                 , gFirstQuoteSymbol
+                                , gRepetitionSymbol
                                 , gSecondQuoteSymbol
                                 , gExceptSymbol
                                 , gSpecialSequenceSymbol
-                                , gRepetitionSymbol
+                                , gStartCommentSymbol
+                                , gStartGroupSymbol
+                                , gStartOptionSymbol
+                                , gStartRepeatSymbol
                                 , gTerminatorSymbol
                                 , gOtherCharacter ) where
 
@@ -28,6 +30,7 @@ gDecimalDigit (Rule "DecimalDigit" t) = gTerm t
 gConcatenateSymbol     (Rule "ConcatenateSymbol" t)     = gTerm t
 gDefiningSymbol        (Rule "DefiningSymbol" t)        = gTerm t
 gAlternativeSymbol     (Rule "AlternativeSymbol" t)     = gTerm t
+gEndCommentSymbol      (Rule "EndCommentSymbol" t)      = gTerm t
 gEndGroupSymbol        (Rule "EndGroupSymbol" t)        = gTerm t
 gEndOptionSymbol       (Rule "EndOptionSymbol" t)       = gTerm t
 gEndRepeatSymbol       (Rule "EndRepeatSymbol" t)       = gTerm t
@@ -36,6 +39,7 @@ gRepetitionSymbol      (Rule "RepetitionSymbol" t)      = gTerm t
 gSecondQuoteSymbol     (Rule "SecondQuoteSymbol" _)     = gEscQuoteS
 gExceptSymbol          (Rule "ExceptSymbol" t)          = gTerm t
 gSpecialSequenceSymbol (Rule "SpecialSequenceSymbol" t) = gTerm t
+gStartCommentSymbol    (Rule "StartCommentSymbol" t)    = gTerm t
 gStartGroupSymbol      (Rule "StartGroupSymbol" t)      = gTerm t
 gStartOptionSymbol     (Rule "StartOptionSymbol" t)     = gTerm t
 gStartRepeatSymbol     (Rule "StartRepeatSymbol" t)     = gTerm t
