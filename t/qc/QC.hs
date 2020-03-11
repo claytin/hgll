@@ -10,10 +10,6 @@ import Test.QuickCheck.Property
 
 import Parser.Generator.Exception
 
-class Variant a where
-    valid   :: Gen a
-    invalid :: Gen a
-
 instance Arbitrary ParseTree where
     arbitrary = sized pt
 
