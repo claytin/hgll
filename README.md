@@ -5,8 +5,8 @@ written in Haskell.
 
 **NOTE!** Right now HGLL does not have a general parser algorithm implemented,
 so it is not a GLL implementation. Details on why can be found in my [master's
-thesis](https://repositorio.ufpe.br/handle/123456789/35363) on the subject of
-certifiable, general parsing, in a purely functional setup.
+thesis](elsewhere) on the subject of certifiable, general parsing, in a purely
+functional setup.
 
 # Installation
 
